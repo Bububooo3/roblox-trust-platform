@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Users" ALTER COLUMN "rblxUserID" SET DATA TYPE BIGINT;

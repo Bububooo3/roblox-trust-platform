@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enums
+enum Status {
+  Success
+  Cancelled
+  Reported
+  Pending
+  Ongoing
+}
+
+enum MediaType {
+  link // url
+  picture // image
+
+  experience // Roblox experience ID
+  group // Roblox group ID
+  asset // Roblox asset ID
+}
+
+// Models
+model User {
+  id         BigInt @id @default(autoincrement())
+  rblxUserID BigInt @unique
+
+  robloxUsername    String
+  productAccountAge Int
+  robloxAccountAge  Int
+
+  // clientTransactions    Transaction[] @relation("ClientTransactions")
+  // developerTransactions Transaction[] @relation("DeveloperTransactions")
+  @@map("Users")
+}
+
+model Transaction {
+  transactionID BigInt @id @default(autoincrement()) // Key
+
+  projectName   String
+  amountInCents Int
+  clientId      Int
+  developerId   Int
+
+  developerReviewId BigInt? @unique // Developer reviews client
+  clientReviewId    BigInt? @unique // Client reviews developer
+  status            Status
+  visible           Boolean
+
+  // Unix ms
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  description String
+  currency    String @default("USD") // for now
+
+  // client          User    @relation("ClientTransactions", fields: [clientId], references: [rblxUserID])
+  // developer       User    @relation("DeveloperTransactions", fields: [developerId], references: [rblxUserID])
+  developerReview Review? @relation("DeveloperReview", fields: [developerReviewId], references: [reviewID])
+  clientReview    Review? @relation("ClientReview", fields: [clientReviewId], references: [reviewID])
+
+  media   Media[]
+
+  @@index([clientId])
+  @@index([developerId])
+  @@index([status])
+  @@map("Transactions")
+}
+
+// Key: ReviewID (uuid)
+model Review {
+  reviewID BigInt @id @default(autoincrement()) // Key
+
+  rating              Int
+  description         String
+  reviewerId          Int
+  revieweeId          Int
+  linkedTransactionId BigInt
+
+  // Back ref
+  asDeveloperReview Transaction? @relation("DeveloperReview")
+  asClientReview    Transaction? @relation("ClientReview")
+
+  @@index([revieweeId])
+  @@unique([reviewerId, linkedTransactionId])
+  @@map("Reviews")
+}
+
+model Media {
+  mediaId BigInt @id @default(autoincrement()) // Key
+
+  type                MediaType
+  linkedTransactionId BigInt
+
+  // Can't both be null
+  contentID     BigInt? // For most media (w/ IDs)
+  contentString String? // for links
+
+  transaction Transaction @relation(fields: [linkedTransactionId], references: [transactionID])
+
+  @@map("Media")
+}

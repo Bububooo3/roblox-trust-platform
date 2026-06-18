@@ -1,0 +1,59 @@
+### Web
+top-level-domain.com
+- /
+	- Landing page
+	- Signup/login
+	- Site description
+	- User count display
+	- Transaction count display
+- /users
+	- Redirects to “explore” page
+	- /{Roblox UserId}
+		- User profile
+		- /history
+			- User’s transaction history
+		- /reviews
+			- User’s ratings and reviews
+- /transactions
+	- Redirects to “explore” page
+	- /{Transaction UUID}
+		- Specified transaction information
+- /explore
+	- List of users (row for each user)
+		- (Each row has username, rating, # transactions, $ earned+spent)
+	- ?search={SEARCH ENTRY}
+		- username or UserId
+	- ?sort={SORT CRITERIA}
+		- username (A-Z)
+		- rating
+		-  transactions #
+		- $ earned+spent
+		- relevance (default)
+	- ?page={PAGE NUMBER}
+		- Self-explanatory
+- /api
+	- /users
+		- /{Roblox UserId}
+			- GET: sends user data as a JSON file
+			- /transactions
+				- GET: sends transaction history of user
+				- ?min={}
+					- Starts at min or 0
+				- ?max={}
+					- Builds container until either no more or index=max 
+			- /reviews
+				- GET: sends review list of user
+				-  ?min={}
+					- Starts at min or 0
+				- ?max={}
+					- Builds container until either no more or index=max
+	- /transactions
+		- ?target={TRANSACTION ID}
+			- Returns the data for specified transaction or not found
+			- Returns array of multiple if input is an array of multiple
+			- Returns not found if even one is missing
+	- /reviews
+		- ?target={REVIEW ID}
+			- Returns the data for specified review or not found
+			- Returns array of multiple if input is an array of multiple
+			- Returns not found if even one is missing
