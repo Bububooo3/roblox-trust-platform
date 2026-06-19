@@ -7,6 +7,15 @@ import {
   getUserFromID,
   newUser,
 } from "./api/user.js";
+import {
+  acceptTransaction,
+  cancelTransaction,
+  completeTransaction,
+  editTransaction,
+  getTransactionsFromTargetQuery,
+  newTransaction,
+  reportTransaction,
+} from "./api/transaction.js";
 
 const app = express();
 
@@ -150,191 +159,26 @@ async function transitionTransaction(
 //   res.json({ status: "ok" });
 // });
 
+// ===========================================================================
+
 // USER API
 app.post("/api/users", newUser);
 app.get("/api/users/:id", getUserFromID);
 app.get("/api/users/:id/transactions", getTransactionsFromUserID);
 app.get("/api/users/:id/reviews", getReviewsFromUserID);
 
+// ===========================================================================
+
 // TRANSACTION API
-// GET /api/transactions?target={id}  (repeat target= for multiple)
-app.get(
-  "/api/transactions",
-  asyncHandler(async (req, res) => {
-    const ids = parseTargetList(req.query.target);
+app.get("/api/transactions", getTransactionsFromTargetQuery);
+app.post("/api/transactions", newTransaction);
+app.patch("/api/transactions/:id", editTransaction);
+app.post("/api/transactions/:id/accept", acceptTransaction);
+app.post("/api/transactions/:id/complete", completeTransaction);
+app.post("/api/transactions/:id/cancel", cancelTransaction);
+app.post("/api/transactions/:id/report", reportTransaction);
 
-    if (ids === null) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
-    if (ids.length === 0) {
-      res.status(400).json({ message: "Missing target query parameter" });
-      return;
-    }
-
-    const transactions = await prisma.transaction.findMany({
-      where: { transactionID: { in: ids } },
-    });
-
-    if (transactions.length !== ids.length) {
-      res.status(404).json({ message: "One or more transactions not found" });
-      return;
-    }
-
-    const byId = new Map(
-      transactions.map((t) => [t.transactionID.toString(), t]),
-    );
-    const ordered = ids.map((id) => byId.get(id.toString())!);
-
-    res.json(
-      ids.length === 1
-        ? serializeBigInts(ordered[0])
-        : serializeBigInts(ordered),
-    );
-  }),
-);
-
-app.post(
-  "/api/transactions",
-  asyncHandler(async (req, res) => {
-    const { projectName, amountInCents, clientId, developerId, description } =
-      req.body;
-
-    const parsedClientId = parseBigIntParam(clientId);
-    const parsedDeveloperId = parseBigIntParam(developerId);
-
-    if (!parsedClientId || !parsedDeveloperId) {
-      res.status(400).json({ message: "Invalid user ID" });
-      return;
-    }
-
-    const [client, developer] = await Promise.all([
-      prisma.user.findUnique({
-        where: { rblxUserID: parsedClientId },
-      }),
-      prisma.user.findUnique({
-        where: { rblxUserID: parsedDeveloperId },
-      }),
-    ]);
-
-    if (!client || !developer) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-
-    const transaction = await prisma.transaction.create({
-      data: {
-        projectName,
-        amountInCents,
-        clientId: parsedClientId,
-        developerId: parsedDeveloperId,
-        description,
-        status: "Pending",
-        visible: true,
-      },
-    });
-
-    res.status(201).json(serializeBigInts(transaction));
-  }),
-);
-
-// PATCH /api/transactions/:id — whitelisted partial edit.
-// Status moves through the dedicated accept/complete/cancel/report actions
-// below instead of being editable here.
-app.patch(
-  "/api/transactions/:id",
-  asyncHandler(async (req, res) => {
-    const localID = req.params.id;
-
-    if (
-      !(
-        typeof localID === "string" &&
-        localID.length > 0 &&
-        localID[0]?.length === 1
-      )
-    ) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
-
-    const id = parseBigIntParam(localID);
-    if (id === null) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
-
-    const { projectName, amountInCents, description, currency, visible } =
-      req.body;
-    const data: Record<string, unknown> = {};
-    if (projectName !== undefined) data.projectName = projectName;
-    if (amountInCents !== undefined) data.amountInCents = amountInCents;
-    if (description !== undefined) data.description = description;
-    if (currency !== undefined) data.currency = currency;
-    if (visible !== undefined) data.visible = visible;
-
-    if (Object.keys(data).length === 0) {
-      res.status(400).json({ message: "No editable fields provided" });
-      return;
-    }
-
-    const existing = await prisma.transaction.findUnique({
-      where: { transactionID: id },
-    });
-    if (!existing) {
-      res
-        .status(404)
-        .json({ message: `Transaction ${req.params.id} not found` });
-      return;
-    }
-
-    const updated = await prisma.transaction.update({
-      where: { transactionID: id },
-      data,
-    });
-
-    res.json(serializeBigInts(updated));
-  }),
-);
-
-// POST /api/transactions/:id/accept — developer accepts a pending job
-app.post(
-  "/api/transactions/:id/accept",
-  asyncHandler(async (req, res) => {
-    await transitionTransaction(req, res, ["Pending"], "Ongoing");
-  }),
-);
-
-// POST /api/transactions/:id/complete — job is finished
-app.post(
-  "/api/transactions/:id/complete",
-  asyncHandler(async (req, res) => {
-    await transitionTransaction(req, res, ["Ongoing"], "Success", {
-      completedAt: new Date(),
-    });
-  }),
-);
-
-// POST /api/transactions/:id/cancel — either party backs out before completion
-app.post(
-  "/api/transactions/:id/cancel",
-  asyncHandler(async (req, res) => {
-    await transitionTransaction(req, res, ["Pending", "Ongoing"], "Cancelled");
-  }),
-);
-
-// POST /api/transactions/:id/report — flag a dispute, allowed even after
-// the job is marked complete
-app.post(
-  "/api/transactions/:id/report",
-  asyncHandler(async (req, res) => {
-    await transitionTransaction(
-      req,
-      res,
-      ["Pending", "Ongoing", "Success"],
-      "Reported",
-    );
-  }),
-);
+// ===========================================================================
 
 // REVIEW API
 
