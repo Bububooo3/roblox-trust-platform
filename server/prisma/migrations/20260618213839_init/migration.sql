@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Reviews" ALTER COLUMN "reviewerId" SET DATA TYPE BIGINT,
+ALTER COLUMN "revieweeId" SET DATA TYPE BIGINT;
+
+-- AlterTable
+ALTER TABLE "Transactions" ALTER COLUMN "clientId" SET DATA TYPE BIGINT,
+ALTER COLUMN "developerId" SET DATA TYPE BIGINT;

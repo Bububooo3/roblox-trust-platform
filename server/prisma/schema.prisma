@@ -44,8 +44,8 @@ model Transaction {
 
   projectName   String
   amountInCents Int
-  clientId      Int
-  developerId   Int
+  clientId      BigInt
+  developerId   BigInt
 
   developerReviewId BigInt? @unique // Developer reviews client
   clientReviewId    BigInt? @unique // Client reviews developer
@@ -65,10 +65,12 @@ model Transaction {
   developerReview Review? @relation("DeveloperReview", fields: [developerReviewId], references: [reviewID])
   clientReview    Review? @relation("ClientReview", fields: [clientReviewId], references: [reviewID])
 
-  media   Media[]
+  media Media[]
 
   @@index([clientId])
   @@index([developerId])
+  @@index([clientId, transactionID])
+  @@index([developerId, transactionID])
   @@index([status])
   @@map("Transactions")
 }
@@ -79,16 +81,17 @@ model Review {
 
   rating              Int
   description         String
-  reviewerId          Int
-  revieweeId          Int
+  reviewerId          BigInt
+  revieweeId          BigInt
   linkedTransactionId BigInt
 
   // Back ref
   asDeveloperReview Transaction? @relation("DeveloperReview")
   asClientReview    Transaction? @relation("ClientReview")
 
-  @@index([revieweeId])
   @@unique([reviewerId, linkedTransactionId])
+  @@index([revieweeId])
+  @@index([revieweeId, reviewID])
   @@map("Reviews")
 }
 

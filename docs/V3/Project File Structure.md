@@ -34,20 +34,37 @@ top-level-domain.com
 - /api
 	- /users
 		- /{Roblox UserId}
-			- GET: sends user data as a JSON file
+			- POST: make new user
+			- GET: send user data
 			- /transactions
-				- GET: sends transaction history of user
+				- GET: send user transaction history
 				- ?cursor={}
-					- Starts at min or 0
 			- /reviews
-				- GET: sends review list of user
-				-  ?cursor={}
-					- Starts at min or 0
+				- GET: send user review history
+				- ?cursor={}
+
 	- /transactions
+		- POST: new transaction
 		- ?target={TRANSACTION ID}
 			- Returns the data for specified transaction or not found
 			- Returns array of multiple if input is an array of multiple
 			- Returns not found if even one is missing
+		- /{Transaction ID}
+			- PATCH: Edits transaction fields (status excluded)
+			- /accept
+				- POST: Developer accepts (from Pending)
+			- /complete
+				- POST: Marks as complete (from Ongoing)
+			- /cancel
+				- POST: Cancels (from Pending or Ongoing)
+			- /report
+				- POST: Flags a dispute (from Pending, Ongoing, or Success)
+			- /reviews
+				- POST: Leaves a review for the other party (from Success)
+			- /media
+				- POST: Attaches media to the transaction
+				- /{Media ID}
+					- DELETE: Removes media from the transaction
 	- /reviews
 		- ?target={REVIEW ID}
 			- Returns the data for specified review or not found
