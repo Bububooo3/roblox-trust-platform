@@ -68,7 +68,7 @@ export function parseTargetList(target: unknown): bigint[] | null {
 // (instead of importing the generated enum) since the "prisma-client"
 // generator's export shape can vary by version — `as any` casts below
 // bridge the gap when these values flow into Prisma's typed `data`.
-export type StatusMirror =
+type StatusMirror =
   | "Success"
   | "Cancelled"
   | "Reported"
@@ -76,7 +76,7 @@ export type StatusMirror =
   | "Ongoing";
 
 // Mirrors the MediaType enum, same reasoning.
-export type MediaTypeMirror =
+type MediaTypeMirror =
   | "link"
   | "picture"
   | "experience"

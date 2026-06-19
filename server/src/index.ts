@@ -16,13 +16,12 @@ import {
   newTransaction,
   reportTransaction,
 } from "./api/transaction.js";
+import { getReviewsFromTargetQuery, newReview } from "./api/review.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-const PAGE_SIZE = 20;
 
 // Helpers
 
@@ -181,131 +180,11 @@ app.post("/api/transactions/:id/report", reportTransaction);
 // ===========================================================================
 
 // REVIEW API
+app.post("/api/transactions/:id/reviews", newReview);
+app.get("/api/reviews", getReviewsFromTargetQuery);
+// TODO maybe add an "editReview" endpoint
 
-// POST /api/transactions/:id/reviews — the client or developer on a
-// completed transaction leaves a review for the other party.
-app.post(
-  "/api/transactions/:id/reviews",
-  asyncHandler(async (req, res) => {
-    const localID = req.params.id;
-
-    if (
-      !(
-        typeof localID === "string" &&
-        localID.length > 0 &&
-        localID[0]?.length === 1
-      )
-    ) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
-
-    const transactionId = parseBigIntParam(localID);
-    if (transactionId === null) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
-
-    const { rating, description, reviewerId } = req.body;
-    const parsedReviewerId = parseBigIntParam(String(reviewerId ?? ""));
-    if (parsedReviewerId === null) {
-      res.status(400).json({ message: "Invalid reviewerId" });
-      return;
-    }
-
-    const transaction = await prisma.transaction.findUnique({
-      where: { transactionID: transactionId },
-    });
-    if (!transaction) {
-      res
-        .status(404)
-        .json({ message: `Transaction ${req.params.id} not found` });
-      return;
-    }
-
-    if (transaction.status !== "Success") {
-      res.status(409).json({
-        message: "Reviews can only be left on completed transactions",
-      });
-      return;
-    }
-
-    let revieweeId: bigint;
-    let slot: "clientReviewId" | "developerReviewId";
-
-    if (parsedReviewerId === transaction.clientId) {
-      revieweeId = transaction.developerId;
-      slot = "clientReviewId"; // client reviews developer
-    } else if (parsedReviewerId === transaction.developerId) {
-      revieweeId = transaction.clientId;
-      slot = "developerReviewId"; // developer reviews client
-    } else {
-      res
-        .status(403)
-        .json({ message: "reviewerId is not a party to this transaction" });
-      return;
-    }
-
-    if (transaction[slot] !== null) {
-      res
-        .status(409)
-        .json({ message: "This party has already reviewed this transaction" });
-      return;
-    }
-
-    const review = await prisma.review.create({
-      data: {
-        rating,
-        description,
-        reviewerId: parsedReviewerId,
-        revieweeId,
-        linkedTransactionId: transactionId,
-      },
-    });
-
-    const updated = await prisma.transaction.update({
-      where: { transactionID: transactionId },
-      data: { [slot]: review.reviewID },
-    });
-
-    res.status(201).json(serializeBigInts({ review, transaction: updated }));
-  }),
-);
-
-// GET /api/reviews?target={id}  (repeat target= for multiple)
-app.get(
-  "/api/reviews",
-  asyncHandler(async (req, res) => {
-    const ids = parseTargetList(req.query.target);
-
-    if (ids === null) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
-    if (ids.length === 0) {
-      res.status(400).json({ message: "Missing target query parameter" });
-      return;
-    }
-
-    const reviews = await prisma.review.findMany({
-      where: { reviewID: { in: ids } },
-    });
-
-    if (reviews.length !== ids.length) {
-      res.status(404).json({ message: "One or more reviews not found" });
-      return;
-    }
-
-    const byId = new Map(reviews.map((r) => [r.reviewID.toString(), r]));
-    const ordered = ids.map((id) => byId.get(id.toString())!);
-
-    res.json(
-      ids.length === 1
-        ? serializeBigInts(ordered[0])
-        : serializeBigInts(ordered),
-    );
-  }),
-);
+// ===========================================================================
 
 // MEDIA API
 
