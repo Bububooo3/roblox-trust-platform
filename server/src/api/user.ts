@@ -3,65 +3,56 @@ import { prisma } from "../../src/lib/prisma.js";
 import {
   parseBigIntParam,
   serializeBigInts,
-  parseTargetList,
-  MEDIA_TYPES,
-  transitionTransaction,
   PAGE_SIZE,
   asyncHandler,
   validateID,
 } from "./util.js";
 
-import type { MediaTypeMirror, StatusMirror } from "./util.js";
-
 // ===========================================================================
 
 // POST .../api/users
-export function newUser() {
-  asyncHandler(async (req, res) => {
-    const user = await prisma.user.create({
-      data: req.body,
-    });
-
-    res.json(serializeBigInts(user));
+export const newUser = asyncHandler(async (req, res) => {
+  const user = await prisma.user.create({
+    data: req.body,
   });
-}
+
+  res.json(serializeBigInts(user));
+});
 
 // ===========================================================================
 
 // GET .../api/users/:id
-export function getUserFromID() {
-  asyncHandler(async (req, res) => {
-    const localID = req.params.id;
+export const getUserFromID = asyncHandler(async (req, res) => {
+  const localID = req.params.id;
 
-    if (!validateID(req.params.id)) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
+  if (!validateID(req.params.id)) {
+    res.status(400).json({ message: "Bad format" });
+    return;
+  }
 
-    const rblxUserID = parseBigIntParam(localID as string);
+  const rblxUserID = parseBigIntParam(localID as string);
 
-    if (rblxUserID === null) {
-      res.status(400).json({ message: "Bad format" });
-      return;
-    }
+  if (rblxUserID === null) {
+    res.status(400).json({ message: "Bad format" });
+    return;
+  }
 
-    const user = await prisma.user.findUnique({
-      where: { rblxUserID },
-    });
-
-    if (!user) {
-      res.status(404).json({ message: `User ${req.params.id} not found` });
-      return;
-    }
-
-    res.json(serializeBigInts(user));
+  const user = await prisma.user.findUnique({
+    where: { rblxUserID },
   });
-}
+
+  if (!user) {
+    res.status(404).json({ message: `User ${req.params.id} not found` });
+    return;
+  }
+
+  res.json(serializeBigInts(user));
+});
 
 // ===========================================================================
 
 // GET .../api/users/:id/transactions?cursor={}
-export function getTransactionsFromUserID() {
+export const getTransactionsFromUserID = // Excludes cursor from result if it is specified
   asyncHandler(async (req, res) => {
     const localID = req.params.id;
 
@@ -110,13 +101,11 @@ export function getTransactionsFromUserID() {
       nextCursor: nextCursor === null ? null : Number(nextCursor),
     });
   });
-}
 
 // ===========================================================================
 
 // GET .../api/users/:id/reviews?cursor={}
-export function getReviewsFromUserID() {
-  // (Reviews ABOUT the user)
+export const getReviewsFromUserID = // (Reviews ABOUT the user)
   asyncHandler(async (req, res) => {
     const localID = req.params.id;
 
@@ -170,4 +159,3 @@ export function getReviewsFromUserID() {
       nextCursor: nextCursor === null ? null : Number(nextCursor),
     });
   });
-}
