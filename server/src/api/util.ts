@@ -1,12 +1,18 @@
 import express from "express";
 import { prisma } from "../../src/lib/prisma.js";
 
+// ===========================================================================
+
 export const PAGE_SIZE = 20;
+
+// ===========================================================================
 
 // Gets whether the ID is valid
 export function validateID(id: unknown) {
   return typeof id === "string" && id.length > 0 && id[1]?.length === 1;
 }
+
+// ===========================================================================
 
 // Parses a route/query param into a BigInt, or null if malformed.
 // Going string -> BigInt directly (rather than through Number) avoids
@@ -19,6 +25,8 @@ export function parseBigIntParam(value: string): bigint | null {
     return null;
   }
 }
+
+// ===========================================================================
 
 // Wraps an async handler so thrown/rejected errors reach the error
 // middleware instead of becoming unhandled rejections.
@@ -33,6 +41,8 @@ export function asyncHandler(
     fn(req, res).catch(next);
   };
 }
+
+// ===========================================================================
 
 // Recursively turns BigInt fields into plain numbers so the response can
 // be JSON-serialized (res.json() throws on a raw BigInt).
@@ -50,6 +60,8 @@ export function serializeBigInts<T>(value: T): any {
   return value;
 }
 
+// ===========================================================================
+
 // Parses ?target=&target=... (repeated key = array, single key = string)
 // into a list of BigInts. Returns null if any entry is malformed.
 export function parseTargetList(target: unknown): bigint[] | null {
@@ -64,6 +76,8 @@ export function parseTargetList(target: unknown): bigint[] | null {
   return ids;
 }
 
+// ===========================================================================
+
 // Mirrors the Status enum in schema.prisma. Kept as a local literal union
 // (instead of importing the generated enum) since the "prisma-client"
 // generator's export shape can vary by version — `as any` casts below
@@ -76,12 +90,8 @@ type StatusMirror =
   | "Ongoing";
 
 // Mirrors the MediaType enum, same reasoning.
-type MediaTypeMirror =
-  | "link"
-  | "picture"
-  | "experience"
-  | "group"
-  | "asset";
+type MediaTypeMirror = "link" | "picture" | "experience" | "group" | "asset";
+
 export const MEDIA_TYPES: MediaTypeMirror[] = [
   "link",
   "picture",
@@ -89,6 +99,8 @@ export const MEDIA_TYPES: MediaTypeMirror[] = [
   "group",
   "asset",
 ];
+
+// ===========================================================================
 
 // Moves a transaction from one of `allowedFrom` statuses to `to`.
 // 404 if the transaction doesn't exist, 409 if it's not in a status this
