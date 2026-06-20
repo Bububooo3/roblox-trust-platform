@@ -5,7 +5,7 @@ import {
   serializeBigInts,
   parseTargetList,
   MEDIA_TYPES,
-  transitionTransaction,
+  setTransactionStatus,
   PAGE_SIZE,
   asyncHandler,
   validateID,

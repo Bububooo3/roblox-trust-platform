@@ -15,7 +15,7 @@ import {
   newTransaction,
   reportTransaction,
 } from "./api/transaction.js";
-import { getReviewsFromTargetQuery, newReview } from "./api/review.js";
+import { editReview, getReviewsFromTargetQuery, newReview } from "./api/review.js";
 import { deleteMedia, getMediaFromID, newMediaFromTransactionID } from "./api/media.js";
 
 // ===========================================================================
@@ -56,7 +56,7 @@ app.post("/api/transactions/:id/report", reportTransaction);
 // REVIEW API
 app.post("/api/transactions/:id/reviews", newReview);
 app.get("/api/reviews", getReviewsFromTargetQuery);
-// TODO maybe add an "editReview" endpoint
+app.patch("/api/reviews/id:", editReview);
 
 // ===========================================================================
 

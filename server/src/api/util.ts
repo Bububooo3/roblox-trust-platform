@@ -105,7 +105,7 @@ export const MEDIA_TYPES: MediaTypeMirror[] = [
 // Moves a transaction from one of `allowedFrom` statuses to `to`.
 // 404 if the transaction doesn't exist, 409 if it's not in a status this
 // action can run from, otherwise 200 with the updated transaction.
-export async function transitionTransaction(
+export async function setTransactionStatus(
   req: express.Request,
   res: express.Response,
   allowedFrom: StatusMirror[],
@@ -114,18 +114,12 @@ export async function transitionTransaction(
 ) {
   const localID = req.params.id;
 
-  if (
-    !(
-      typeof localID === "string" &&
-      localID.length > 0 &&
-      localID[0]?.length === 1
-    )
-  ) {
+  if (validateID(localID)) {
     res.status(400).json({ message: "Bad format" });
     return;
   }
 
-  const id = parseBigIntParam(localID);
+  const id = parseBigIntParam(localID as string);
   if (id === null) {
     res.status(400).json({ message: "Bad format" });
     return;

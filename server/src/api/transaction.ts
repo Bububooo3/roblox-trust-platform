@@ -4,7 +4,7 @@ import {
   parseBigIntParam,
   serializeBigInts,
   parseTargetList,
-  transitionTransaction,
+  setTransactionStatus,
   asyncHandler,
   validateID,
 } from "./util.js";
@@ -104,11 +104,11 @@ export const editTransaction = asyncHandler(async (req, res) => {
     return;
   }
 
-  const { projectName, description, currency, visible } = req.body;
+  const { projectName, description, amountInCents, currency, visible } = req.body;
   const data: Record<string, unknown> = {};
 
   if (projectName !== undefined) data.projectName = projectName;
-  // if (amountInCents !== undefined) data.amountInCents = amountInCents;
+  if (amountInCents !== undefined) data.amountInCents = amountInCents;
   if (description !== undefined) data.description = description;
   if (currency !== undefined) data.currency = currency;
   if (visible !== undefined) data.visible = visible;
@@ -140,7 +140,7 @@ export const editTransaction = asyncHandler(async (req, res) => {
 // POST .../api/transactions/:id/accept
 export const acceptTransaction = // Developer accepts a pending job
   asyncHandler(async (req, res) => {
-    await transitionTransaction(req, res, ["Pending"], "Ongoing");
+    await setTransactionStatus(req, res, ["Pending"], "Ongoing");
   });
 
 // ===========================================================================
@@ -148,7 +148,7 @@ export const acceptTransaction = // Developer accepts a pending job
 // POST .../api/transactions/:id/complete
 export const completeTransaction = // The job is finished
   asyncHandler(async (req, res) => {
-    await transitionTransaction(req, res, ["Ongoing"], "Success", {
+    await setTransactionStatus(req, res, ["Ongoing"], "Success", {
       completedAt: new Date(),
     });
   });
@@ -158,7 +158,7 @@ export const completeTransaction = // The job is finished
 // POST .../api/transactions/:id/cancel
 export const cancelTransaction = // Either party backs out before the job's done
   asyncHandler(async (req, res) => {
-    await transitionTransaction(req, res, ["Pending", "Ongoing"], "Cancelled");
+    await setTransactionStatus(req, res, ["Pending", "Ongoing"], "Cancelled");
   });
 
 // ===========================================================================
@@ -166,7 +166,7 @@ export const cancelTransaction = // Either party backs out before the job's done
 // POST .../api/transactions/:id/report
 export const reportTransaction = // Flag a dispute, allowed even after job's done
   asyncHandler(async (req, res) => {
-    await transitionTransaction(
+    await setTransactionStatus(
       req,
       res,
       ["Pending", "Ongoing", "Success"],

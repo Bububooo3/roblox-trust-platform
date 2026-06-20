@@ -122,3 +122,48 @@ export const getReviewsFromTargetQuery = asyncHandler(async (req, res) => {
     ids.length === 1 ? serializeBigInts(ordered[0]) : serializeBigInts(ordered),
   );
 });
+
+// ===========================================================================
+
+// PATCH .../api/reviews/:id
+export const editReview = asyncHandler(async (req, res) => {
+  const localID = req.params.id;
+
+  if (!validateID(localID)) {
+    res.status(400).json({ message: "Bad format" });
+    return;
+  }
+
+  const id = parseBigIntParam(localID as string);
+  if (id === null) {
+    res.status(400).json({ message: "Bad format" });
+    return;
+  }
+
+  const { rating, description } = req.body;
+  const data: Record<string, unknown> = {};
+
+  if (rating !== undefined) data.projectName = rating;
+  if (description !== undefined) data.description = description;
+
+  if (Object.keys(data).length === 0) {
+    res.status(400).json({ message: "No editable fields provided" });
+    return;
+  }
+
+  const targetReview = await prisma.review.findUnique({
+    where: { reviewID: id },
+  });
+
+  if (!targetReview) {
+    res.status(404).json({ message: `Review ${req.params.id} not found` });
+    return;
+  }
+
+  const updated = await prisma.review.update({
+    where: { reviewID: id },
+    data,
+  });
+
+  res.json(serializeBigInts(updated));
+});

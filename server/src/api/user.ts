@@ -109,18 +109,12 @@ export const getReviewsFromUserID = // (Reviews ABOUT the user)
   asyncHandler(async (req, res) => {
     const localID = req.params.id;
 
-    if (
-      !(
-        typeof localID === "string" &&
-        localID.length > 0 &&
-        localID[1]?.length === 1
-      )
-    ) {
+    if (!validateID(localID)) {
       res.status(400).json({ message: "Bad format" });
       return;
     }
 
-    const rblxUserID = parseBigIntParam(localID);
+    const rblxUserID = parseBigIntParam(localID as string);
     if (rblxUserID === null) {
       res.status(400).json({ message: "Bad format" });
       return;
