@@ -92,5 +92,5 @@ model Application {
   name      String
   apiKey    String   @unique
   createdAt DateTime @default(now())
-  // active    Boolean  @default(true)
+  active    Boolean  @default(true)
 }

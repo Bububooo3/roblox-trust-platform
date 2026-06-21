@@ -1,9 +1,9 @@
 import express from "express";
 import { prisma } from "../../src/lib/prisma.js";
 import {
-  parseBigIntParam,
+  getBigIntFromString,
   serializeBigInts,
-  parseTargetList,
+  getBigIntsFromTargetQueries,
   MEDIA_TYPES,
   setTransactionStatus,
   PAGE_SIZE,

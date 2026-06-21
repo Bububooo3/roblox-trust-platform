@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import {
+  editUser,
   getReviewsFromUserID,
   getTransactionsFromUserID,
   getUserFromID,
@@ -15,9 +17,18 @@ import {
   newTransaction,
   reportTransaction,
 } from "./api/transaction.js";
-import { editReview, getReviewsFromTargetQuery, newReview } from "./api/review.js";
-import { deleteMedia, getMediaFromID, newMediaFromTransactionID } from "./api/media.js";
+import {
+  editReview,
+  getReviewsFromTargetQuery,
+  newReview,
+} from "./api/review.js";
+import {
+  deleteMedia,
+  getMediaFromID,
+  newMediaFromTransactionID,
+} from "./api/media.js";
 import { destroyAPIkey, generateAPIkey } from "./api/key.js";
+import { authAPIkey } from "./middleware/auth.js";
 
 // ===========================================================================
 
@@ -25,6 +36,14 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api", authAPIkey);
+app.use(
+  "/api",
+  rateLimit({
+    windowMs: 60_000,
+    max: 100,
+  }),
+);
 
 // ===========================================================================
 
@@ -40,6 +59,7 @@ app.post("/api/users", newUser);
 app.get("/api/users/:id", getUserFromID);
 app.get("/api/users/:id/transactions", getTransactionsFromUserID);
 app.get("/api/users/:id/reviews", getReviewsFromUserID);
+app.patch("/api/users/:id", editUser);
 
 // ===========================================================================
 
@@ -69,12 +89,12 @@ app.get("/api/transactions/:id/media/:mediaId", getMediaFromID);
 // ==========================================================================
 
 // ACCESS KEY API
-app.post("/api/keys", generateAPIkey)
-app.delete("/api/keys", destroyAPIkey)
+app.post("/api/keys", generateAPIkey);
+app.delete("/api/keys", destroyAPIkey);
 
 // ==========================================================================
 
-// Catches anything asyncHandler forwarded via next(err)
+// ERROR HANDLING
 app.use(
   (
     err: unknown,
@@ -89,7 +109,7 @@ app.use(
 
 // ===========================================================================
 
-// START SERVER
+// DEV SERVER
 app.listen(3000, () => {
   console.log("API running on port 3000");
 });

@@ -1,9 +1,9 @@
 import express from "express";
 import { prisma } from "../../src/lib/prisma.js";
 import {
-  parseBigIntParam,
+  getBigIntFromString,
   serializeBigInts,
-  parseTargetList,
+  getBigIntsFromTargetQueries,
   setTransactionStatus,
   asyncHandler,
   validateID,
@@ -13,7 +13,7 @@ import {
 
 // GET .../api/transactions?target={}
 export const getTransactionsFromTargetQuery = asyncHandler(async (req, res) => {
-  const ids = parseTargetList(req.query.target);
+  const ids = getBigIntsFromTargetQueries(req.query.target);
 
   if (ids === null) {
     res.status(400).json({ message: "Bad format" });
@@ -50,8 +50,8 @@ export const newTransaction = asyncHandler(async (req, res) => {
   const { projectName, amountInCents, clientId, developerId, description } =
     req.body;
 
-  const parsedClientId = parseBigIntParam(clientId);
-  const parsedDeveloperId = parseBigIntParam(developerId);
+  const parsedClientId = getBigIntFromString(clientId);
+  const parsedDeveloperId = getBigIntFromString(developerId);
 
   if (!parsedClientId || !parsedDeveloperId) {
     res.status(400).json({ message: "Invalid user ID" });
@@ -98,7 +98,7 @@ export const editTransaction = asyncHandler(async (req, res) => {
     return;
   }
 
-  const id = parseBigIntParam(localID as string);
+  const id = getBigIntFromString(localID as string);
   if (id === null) {
     res.status(400).json({ message: "Bad format" });
     return;

@@ -1,7 +1,7 @@
 import express from "express";
 import { prisma } from "../../src/lib/prisma.js";
 import {
-  parseBigIntParam,
+  getBigIntFromString,
   serializeBigInts,
   MEDIA_TYPES,
   asyncHandler,
@@ -20,7 +20,7 @@ export const newMediaFromTransactionID = // Attach link/pic/asset/experince/grou
       return;
     }
 
-    const transactionId = parseBigIntParam(localID as string);
+    const transactionId = getBigIntFromString(localID as string);
     if (transactionId === null) {
       res.status(400).json({ message: "Bad format" });
       return;
@@ -58,7 +58,7 @@ export const newMediaFromTransactionID = // Attach link/pic/asset/experince/grou
       }
       data.contentString = contentString;
     } else {
-      const parsedContentID = parseBigIntParam(String(contentID ?? ""));
+      const parsedContentID = getBigIntFromString(String(contentID ?? ""));
       if (parsedContentID === null) {
         res
           .status(400)
@@ -87,8 +87,8 @@ export const deleteMedia = asyncHandler(async (req, res) => {
     return;
   }
 
-  const transactionId = parseBigIntParam(localID1 as string);
-  const mediaId = parseBigIntParam(localID2 as string);
+  const transactionId = getBigIntFromString(localID1 as string);
+  const mediaId = getBigIntFromString(localID2 as string);
 
   if (transactionId === null || mediaId === null) {
     res.status(400).json({ message: "Bad format" });
@@ -123,8 +123,8 @@ export const getMediaFromID = asyncHandler(async (req, res) => {
     return;
   }
 
-  const transactionId = parseBigIntParam(localID1 as string);
-  const mediaId = parseBigIntParam(localID2 as string);
+  const transactionId = getBigIntFromString(localID1 as string);
+  const mediaId = getBigIntFromString(localID2 as string);
 
   if (transactionId === null || mediaId === null) {
     res.status(400).json({ message: "Bad format" });

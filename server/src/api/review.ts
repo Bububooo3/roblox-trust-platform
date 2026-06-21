@@ -1,9 +1,9 @@
 import express from "express";
 import { prisma } from "../../src/lib/prisma.js";
 import {
-  parseBigIntParam,
+  getBigIntFromString,
   serializeBigInts,
-  parseTargetList,
+  getBigIntsFromTargetQueries,
   asyncHandler,
   validateID,
 } from "./util.js";
@@ -20,14 +20,14 @@ export const newReview = // client/dev on a completed transaction reviews other 
       return;
     }
 
-    const transactionId = parseBigIntParam(localID as string);
+    const transactionId = getBigIntFromString(localID as string);
     if (transactionId === null) {
       res.status(400).json({ message: "Bad format" });
       return;
     }
 
     const { rating, description, reviewerId } = req.body;
-    const parsedReviewerId = parseBigIntParam(String(reviewerId ?? ""));
+    const parsedReviewerId = getBigIntFromString(String(reviewerId ?? ""));
     if (parsedReviewerId === null) {
       res.status(400).json({ message: "Invalid reviewerId" });
       return;
@@ -95,7 +95,7 @@ export const newReview = // client/dev on a completed transaction reviews other 
 
 // GET .../api/reviews?target={}
 export const getReviewsFromTargetQuery = asyncHandler(async (req, res) => {
-  const ids = parseTargetList(req.query.target);
+  const ids = getBigIntsFromTargetQueries(req.query.target);
 
   if (ids === null) {
     res.status(400).json({ message: "Bad format" });
@@ -134,7 +134,7 @@ export const editReview = asyncHandler(async (req, res) => {
     return;
   }
 
-  const id = parseBigIntParam(localID as string);
+  const id = getBigIntFromString(localID as string);
   if (id === null) {
     res.status(400).json({ message: "Bad format" });
     return;

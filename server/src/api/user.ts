@@ -1,7 +1,7 @@
 import express from "express";
 import { prisma } from "../../src/lib/prisma.js";
 import {
-  parseBigIntParam,
+  getBigIntFromString,
   serializeBigInts,
   PAGE_SIZE,
   asyncHandler,
@@ -30,7 +30,7 @@ export const getUserFromID = asyncHandler(async (req, res) => {
     return;
   }
 
-  const rblxUserID = parseBigIntParam(localID as string);
+  const rblxUserID = getBigIntFromString(localID as string);
 
   if (rblxUserID === null) {
     res.status(400).json({ message: "Bad format" });
@@ -61,14 +61,15 @@ export const getTransactionsFromUserID = // Excludes cursor from result if it is
       return;
     }
 
-    const rblxUserID = parseBigIntParam(localID as string);
+    const rblxUserID = getBigIntFromString(localID as string);
     if (rblxUserID === null) {
       res.status(400).json({ message: "Bad format" });
       return;
     }
 
     const param = req.query.cursor;
-    const cursor = param === undefined ? 0n : parseBigIntParam(String(param));
+    const cursor =
+      param === undefined ? 0n : getBigIntFromString(String(param));
 
     if (cursor === null) {
       res.status(400).json({ message: "Bad cursor format" });
@@ -114,7 +115,7 @@ export const getReviewsFromUserID = // (Reviews ABOUT the user)
       return;
     }
 
-    const rblxUserID = parseBigIntParam(localID as string);
+    const rblxUserID = getBigIntFromString(localID as string);
     if (rblxUserID === null) {
       res.status(400).json({ message: "Bad format" });
       return;
@@ -122,7 +123,7 @@ export const getReviewsFromUserID = // (Reviews ABOUT the user)
 
     const cursorParam = req.query.cursor;
     const cursor =
-      cursorParam === undefined ? 0n : parseBigIntParam(String(cursorParam));
+      cursorParam === undefined ? 0n : getBigIntFromString(String(cursorParam));
     if (cursor === null) {
       res.status(400).json({ message: "Bad cursor format" });
       return;
@@ -157,3 +158,50 @@ export const getReviewsFromUserID = // (Reviews ABOUT the user)
 // ===========================================================================
 
 // PATCH .../api/users/:id
+export const editUser = asyncHandler(async (req, res) => {
+  const localID = req.params.id;
+
+  if (!validateID(localID)) {
+    res.status(400).json({ message: "Bad format" });
+    return;
+  }
+
+  const rblxUserID = getBigIntFromString(localID as string);
+  if (rblxUserID === null) {
+    res.status(400).json({ message: "Bad format" });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({ where: { rblxUserID } });
+  if (!user) {
+    res.status(404).json({ message: `User ${req.params.id} not found` });
+    return;
+  }
+
+  const { robloxUsername } = req.body;
+
+  const data: Record<string, unknown> = {};
+
+  if (robloxUsername !== undefined) data.robloxUsername = robloxUsername;
+
+  if (Object.keys(data).length === 0) {
+    res.status(400).json({ message: "No editable fields provided" });
+    return;
+  }
+
+  const targetUser = await prisma.user.findUnique({
+    where: { rblxUserID },
+  });
+
+  if (!targetUser) {
+    res.status(404).json({ message: `User ${localID} not found` });
+    return;
+  }
+
+  const updated = await prisma.user.update({
+    where: { rblxUserID },
+    data,
+  });
+
+  res.json(serializeBigInts(updated));
+});
