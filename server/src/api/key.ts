@@ -6,7 +6,7 @@ import { asyncHandler } from "./util.js";
 
 // ===========================================================================
 
-// POST .../api/keys
+// POST .../api-keys
 export const generateAPIkey = asyncHandler(async (req, res) => {
   const apiKey = crypto.randomBytes(32).toString("hex");
 
@@ -29,12 +29,23 @@ export const generateAPIkey = asyncHandler(async (req, res) => {
 
 // ===========================================================================
 
-// DELETE .../api/keys
+// DELETE .../api-keys
 export const destroyAPIkey = asyncHandler(async (req, res) => {
   const { apiKey } = req.body;
 
   if (!apiKey) {
     res.status(400).json({ message: "Bad format" });
+    return;
+  }
+
+  const key = await prisma.application.findUnique({
+    where: {
+      apiKey,
+    },
+  });
+
+  if (!key) {
+    res.status(404).json({ message: `API key (${apiKey}) not found` });
     return;
   }
 

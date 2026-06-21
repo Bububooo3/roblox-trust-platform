@@ -32,13 +32,23 @@ import { authAPIkey } from "./middleware/auth.js";
 
 // ===========================================================================
 
+// SETUP
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use("/api", authAPIkey);
+
 app.use(
   "/api",
+  rateLimit({
+    windowMs: 60_000,
+    max: 100,
+  }),
+);
+
+app.use(
+  "/api-keys",
   rateLimit({
     windowMs: 60_000,
     max: 100,
@@ -89,8 +99,8 @@ app.get("/api/transactions/:id/media/:mediaId", getMediaFromID);
 // ==========================================================================
 
 // ACCESS KEY API
-app.post("/api/keys", generateAPIkey);
-app.delete("/api/keys", destroyAPIkey);
+app.post("/api-keys", generateAPIkey);
+app.delete("/api-keys", authAPIkey, destroyAPIkey);
 
 // ==========================================================================
 
