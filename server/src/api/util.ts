@@ -9,7 +9,7 @@ export const PAGE_SIZE = 20;
 
 // Gets whether the ID is valid
 export function validateID(id: unknown) {
-  return typeof id === "string" && id.length > 0 && id[1]?.length === 1;
+  return typeof id === "string" && id.length > 0 && id[0]?.length === 1;
 }
 
 // ===========================================================================
@@ -114,7 +114,7 @@ export async function setTransactionStatus(
 ) {
   const localID = req.params.id;
 
-  if (validateID(localID)) {
+  if (!validateID(localID)) {
     res.status(400).json({ message: "Bad format" });
     return;
   }

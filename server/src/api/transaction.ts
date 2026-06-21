@@ -104,7 +104,8 @@ export const editTransaction = asyncHandler(async (req, res) => {
     return;
   }
 
-  const { projectName, description, amountInCents, currency, visible } = req.body;
+  const { projectName, description, amountInCents, currency, visible } =
+    req.body;
   const data: Record<string, unknown> = {};
 
   if (projectName !== undefined) data.projectName = projectName;
@@ -123,7 +124,7 @@ export const editTransaction = asyncHandler(async (req, res) => {
   });
 
   if (!targetTransaction) {
-    res.status(404).json({ message: `Transaction ${req.params.id} not found` });
+    res.status(404).json({ message: `Transaction ${localID} not found` });
     return;
   }
 

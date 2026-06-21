@@ -17,6 +17,7 @@ import {
 } from "./api/transaction.js";
 import { editReview, getReviewsFromTargetQuery, newReview } from "./api/review.js";
 import { deleteMedia, getMediaFromID, newMediaFromTransactionID } from "./api/media.js";
+import { destroyAPIkey, generateAPIkey } from "./api/key.js";
 
 // ===========================================================================
 
@@ -56,7 +57,7 @@ app.post("/api/transactions/:id/report", reportTransaction);
 // REVIEW API
 app.post("/api/transactions/:id/reviews", newReview);
 app.get("/api/reviews", getReviewsFromTargetQuery);
-app.patch("/api/reviews/id:", editReview);
+app.patch("/api/reviews/:id", editReview);
 
 // ===========================================================================
 
@@ -64,6 +65,12 @@ app.patch("/api/reviews/id:", editReview);
 app.post("/api/transactions/:id/media", newMediaFromTransactionID);
 app.delete("/api/transactions/:id/media/:mediaId", deleteMedia);
 app.get("/api/transactions/:id/media/:mediaId", getMediaFromID);
+
+// ==========================================================================
+
+// ACCESS KEY API
+app.post("/api/keys", generateAPIkey)
+app.delete("/api/keys", destroyAPIkey)
 
 // ==========================================================================
 
