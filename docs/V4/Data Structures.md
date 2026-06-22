@@ -93,7 +93,7 @@
 
 | Property    | Type     | Description                                                      |
 | ----------- | -------- | ---------------------------------------------------------------- |
-| `id`        | String   | In-house identifier for the application object                   |
+| `id`        | String   | In-house identifier for the application object (cuid)            |
 | `name`      | String   | User-provided name associated w/ API key                         |
 | `apiKey`    | String   | The api key itself (crypto-generated hex string)                 |
 | `createdAt` | DateTime | Date of creation of the apiKey                                   |

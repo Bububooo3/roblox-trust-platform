@@ -1,7 +1,7 @@
-| Database     | Key           | Value(s)                                    |
-| ------------ | ------------- | ------------------------------------------- |
-| Users        | Roblox UserId | [[Data Structures#User]] (all other)        |
-| Transactions | TransactionID | [[Data Structures#Transaction]] (all other) |
-| Reviews      | ReviewID      | [[Data Structures#Review]]                  |
-| Media        | MediaID       | Media (image \| string \| numeric)          |
-|              |               |                                             |
+| Database     | Identifier (Key) Properties                                | Associated Properties                                                                                                                                                                |
+| ------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Users        | `id` `rblxUserId`                                          | `robloxUsername` `productAccountAge` `robloxAccountAge` `lastLogin`                                                                                                                  |
+| Transactions | `transactionID` `clientId` `developerId` `status`          | `projectName` `amountInCents` `developerReviewId` `clientReviewId` `visible` `createdAt` `updatedAt` `completedAt` `description` `currency` `media` `clientReview` `developerReview` |
+| Reviews      | `reviewID` `reviewerId` `revieweeId` `linkedTransactionId` | `rating` `description` `asClientReview` `asDeveloperReview`                                                                                                                          |
+| Media        | `mediaId`                                                  | `type` `contentID` `contentString` `transaction`                                                                                                                                     |
+| Applications | `id`                                                       | `name` `apiKey` `active`                                                                                                                                                             |
