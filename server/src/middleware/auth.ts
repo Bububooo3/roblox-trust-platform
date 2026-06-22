@@ -1,6 +1,9 @@
 import express from "express";
 import { prisma } from "../lib/prisma.js";
 
+// ===========================================================================
+
+// AUTHORIZATION
 export async function authAPIkey(
   req: express.Request,
   res: express.Response,
@@ -23,6 +26,23 @@ export async function authAPIkey(
   }
 
   req.application = application;
+
+  next();
+}
+
+// ===========================================================================
+
+// AUTHENTICATION
+export async function authUser(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  if (!req.session.userId) {
+    return res.status(401).json({
+      message: "Authentication required",
+    });
+  }
 
   next();
 }

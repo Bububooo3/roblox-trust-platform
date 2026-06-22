@@ -11,13 +11,13 @@ import {
 // ===========================================================================
 
 // POST .../api/users
-export const newUser = asyncHandler(async (req, res) => {
-  const user = await prisma.user.create({
-    data: req.body,
-  });
+// export const newUser = asyncHandler(async (req, res) => {
+//   const user = await prisma.user.create({
+//     data: req.body,
+//   });
 
-  res.json(serializeBigInts(user));
-});
+//   res.json(serializeBigInts(user));
+// });
 
 // ===========================================================================
 
@@ -158,50 +158,50 @@ export const getReviewsFromUserID = // (Reviews ABOUT the user)
 // ===========================================================================
 
 // PATCH .../api/users/:id
-export const editUser = asyncHandler(async (req, res) => {
-  const localID = req.params.id;
+// export const editUser = asyncHandler(async (req, res) => {
+//   const localID = req.params.id;
 
-  if (!validateID(localID)) {
-    res.status(400).json({ message: "Bad format" });
-    return;
-  }
+//   if (!validateID(localID)) {
+//     res.status(400).json({ message: "Bad format" });
+//     return;
+//   }
 
-  const rblxUserID = getBigIntFromString(localID as string);
-  if (rblxUserID === null) {
-    res.status(400).json({ message: "Bad format" });
-    return;
-  }
+//   const rblxUserID = getBigIntFromString(localID as string);
+//   if (rblxUserID === null) {
+//     res.status(400).json({ message: "Bad format" });
+//     return;
+//   }
 
-  const user = await prisma.user.findUnique({ where: { rblxUserID } });
-  if (!user) {
-    res.status(404).json({ message: `User ${req.params.id} not found` });
-    return;
-  }
+//   const user = await prisma.user.findUnique({ where: { rblxUserID } });
+//   if (!user) {
+//     res.status(404).json({ message: `User ${req.params.id} not found` });
+//     return;
+//   }
 
-  const { robloxUsername } = req.body;
+//   const { robloxUsername } = req.body;
 
-  const data: Record<string, unknown> = {};
+//   const data: Record<string, unknown> = {};
 
-  if (robloxUsername !== undefined) data.robloxUsername = robloxUsername;
+//   if (robloxUsername !== undefined) data.robloxUsername = robloxUsername;
 
-  if (Object.keys(data).length === 0) {
-    res.status(400).json({ message: "No editable fields provided" });
-    return;
-  }
+//   if (Object.keys(data).length === 0) {
+//     res.status(400).json({ message: "No editable fields provided" });
+//     return;
+//   }
 
-  const targetUser = await prisma.user.findUnique({
-    where: { rblxUserID },
-  });
+//   const targetUser = await prisma.user.findUnique({
+//     where: { rblxUserID },
+//   });
 
-  if (!targetUser) {
-    res.status(404).json({ message: `User ${localID} not found` });
-    return;
-  }
+//   if (!targetUser) {
+//     res.status(404).json({ message: `User ${localID} not found` });
+//     return;
+//   }
 
-  const updated = await prisma.user.update({
-    where: { rblxUserID },
-    data,
-  });
+//   const updated = await prisma.user.update({
+//     where: { rblxUserID },
+//     data,
+//   });
 
-  res.json(serializeBigInts(updated));
-});
+//   res.json(serializeBigInts(updated));
+// });

@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+import session from "express-session";
 import {
-  editUser,
+  // editUser,
   getReviewsFromUserID,
   getTransactionsFromUserID,
   getUserFromID,
-  newUser,
+  // newUser,
 } from "./api/user.js";
 import {
   acceptTransaction,
@@ -28,7 +29,8 @@ import {
   newMediaFromTransactionID,
 } from "./api/media.js";
 import { destroyAPIkey, generateAPIkey } from "./api/key.js";
-import { authAPIkey } from "./middleware/auth.js";
+import { authAPIkey, authUser } from "./middleware/auth.js";
+import { robloxLoginEnter, robloxLoginReturn } from "./middleware/roblox.js";
 
 // ===========================================================================
 
@@ -57,6 +59,33 @@ app.use(
 
 // ===========================================================================
 
+// SESSION PROTECTION
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7, // (a week)
+    },
+  }),
+);
+
+// ===========================================================================
+
+// ROBLOX SSO SENDOFF
+app.get("/auth/roblox/login", robloxLoginEnter);
+
+// ===========================================================================
+
+// ROBLOX SSO RECEPTION
+app.get("/auth/roblox/return", robloxLoginReturn);
+// ===========================================================================
+
 // HEALTH CHECK API
 app.get("/api/health", (_, res) => {
   res.json({ status: "ok" });
@@ -65,35 +94,35 @@ app.get("/api/health", (_, res) => {
 // ===========================================================================
 
 // USER API
-app.post("/api/users", newUser);
+// app.post("/api/users", newUser);
 app.get("/api/users/:id", getUserFromID);
 app.get("/api/users/:id/transactions", getTransactionsFromUserID);
 app.get("/api/users/:id/reviews", getReviewsFromUserID);
-app.patch("/api/users/:id", editUser);
+// app.patch("/api/users/:id", editUser);
 
 // ===========================================================================
 
 // TRANSACTION API
 app.get("/api/transactions", getTransactionsFromTargetQuery);
-app.post("/api/transactions", newTransaction);
-app.patch("/api/transactions/:id", editTransaction);
-app.post("/api/transactions/:id/accept", acceptTransaction);
-app.post("/api/transactions/:id/complete", completeTransaction);
-app.post("/api/transactions/:id/cancel", cancelTransaction);
-app.post("/api/transactions/:id/report", reportTransaction);
+app.post("/api/transactions", authUser, newTransaction);
+app.patch("/api/transactions/:id", authUser, editTransaction);
+app.post("/api/transactions/:id/accept", authUser, acceptTransaction);
+app.post("/api/transactions/:id/complete", authUser, completeTransaction);
+app.post("/api/transactions/:id/cancel", authUser, cancelTransaction);
+app.post("/api/transactions/:id/report", authUser, reportTransaction);
 
 // ===========================================================================
 
 // REVIEW API
-app.post("/api/transactions/:id/reviews", newReview);
+app.post("/api/transactions/:id/reviews", authUser, newReview);
 app.get("/api/reviews", getReviewsFromTargetQuery);
-app.patch("/api/reviews/:id", editReview);
+app.patch("/api/reviews/:id", authUser, editReview);
 
 // ===========================================================================
 
 // MEDIA API
-app.post("/api/transactions/:id/media", newMediaFromTransactionID);
-app.delete("/api/transactions/:id/media/:mediaId", deleteMedia);
+app.post("/api/transactions/:id/media", authUser, newMediaFromTransactionID);
+app.delete("/api/transactions/:id/media/:mediaId", authUser, deleteMedia);
 app.get("/api/transactions/:id/media/:mediaId", getMediaFromID);
 
 // ==========================================================================
@@ -120,6 +149,6 @@ app.use(
 // ===========================================================================
 
 // DEV SERVER
-app.listen(3000, () => {
-  console.log("API running on port 3000");
+app.listen(Number(process.env.BACKEND_PORT), () => {
+  console.log(`API running on port ${process.env.BACKEND_PORT}`);
 });

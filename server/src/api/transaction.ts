@@ -58,6 +58,17 @@ export const newTransaction = asyncHandler(async (req, res) => {
     return;
   }
 
+  if (
+    parsedClientId !== req.session.userId &&
+    parsedDeveloperId !== req.session.userId
+  ) {
+    res.status(403).json({
+      message: "Forbidden",
+    });
+
+    return;
+  }
+
   const [client, developer] = await Promise.all([
     prisma.user.findUnique({
       where: { rblxUserID: parsedClientId },
@@ -92,6 +103,7 @@ export const newTransaction = asyncHandler(async (req, res) => {
 // PATCH .../api/transactions/:id
 export const editTransaction = asyncHandler(async (req, res) => {
   const localID = req.params.id;
+  const { userID } = req.body;
 
   if (!validateID(localID)) {
     res.status(400).json({ message: "Bad format" });
@@ -125,6 +137,17 @@ export const editTransaction = asyncHandler(async (req, res) => {
 
   if (!targetTransaction) {
     res.status(404).json({ message: `Transaction ${localID} not found` });
+    return;
+  }
+
+  if (
+    targetTransaction.clientId !== req.session.userId &&
+    targetTransaction.developerId !== req.session.userId
+  ) {
+    res.status(403).json({
+      message: "Forbidden",
+    });
+
     return;
   }
 

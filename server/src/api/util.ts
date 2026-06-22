@@ -135,24 +135,21 @@ export async function setTransactionStatus(
     return;
   }
 
+  if (
+    transaction.clientId !== req.session.userId &&
+    transaction.developerId !== req.session.userId
+  ) {
+    res.status(403).json({
+      message: "Forbidden",
+    });
+
+    return;
+  }
+
   const updated = await prisma.transaction.update({
     where: { transactionID: id },
     data: { status: to as any, ...extraData },
   });
 
   res.json(serializeBigInts(updated));
-}
-
-// ===========================================================================
-
-// Extend express type for API key
-declare global {
-  namespace Express {
-    interface Request {
-      application?: {
-        id: string;
-        name: string;
-      };
-    }
-  }
 }
