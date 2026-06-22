@@ -7,6 +7,7 @@ import {
   setTransactionStatus,
   asyncHandler,
   validateID,
+  type StatusMirror,
 } from "./util.js";
 
 // ===========================================================================
@@ -103,7 +104,7 @@ export const newTransaction = asyncHandler(async (req, res) => {
 // PATCH .../api/transactions/:id
 export const editTransaction = asyncHandler(async (req, res) => {
   const localID = req.params.id;
-  const { userID } = req.body;
+  // const { userID } = req.body;
 
   if (!validateID(localID)) {
     res.status(400).json({ message: "Bad format" });
@@ -121,7 +122,6 @@ export const editTransaction = asyncHandler(async (req, res) => {
   const data: Record<string, unknown> = {};
 
   if (projectName !== undefined) data.projectName = projectName;
-  if (amountInCents !== undefined) data.amountInCents = amountInCents;
   if (description !== undefined) data.description = description;
   if (currency !== undefined) data.currency = currency;
   if (visible !== undefined) data.visible = visible;
@@ -149,6 +149,12 @@ export const editTransaction = asyncHandler(async (req, res) => {
     });
 
     return;
+  }
+
+  const myStatus = targetTransaction.status as StatusMirror;
+
+  if (myStatus === "Pending") {
+    if (amountInCents !== undefined) data.amountInCents = amountInCents;
   }
 
   const updated = await prisma.transaction.update({

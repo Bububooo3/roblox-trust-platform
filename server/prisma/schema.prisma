@@ -34,8 +34,9 @@ model Transaction {
   description       String
   currency          String    @default("USD")
   media             Media[]
-  clientReview      Review?   @relation("ClientReview", fields: [clientReviewId], references: [reviewID])
-  developerReview   Review?   @relation("DeveloperReview", fields: [developerReviewId], references: [reviewID])
+
+  clientReview    Review? @relation("ClientReview", fields: [clientReviewId], references: [reviewID])
+  developerReview Review? @relation("DeveloperReview", fields: [developerReviewId], references: [reviewID])
 
   @@index([clientId])
   @@index([developerId])
@@ -46,14 +47,15 @@ model Transaction {
 }
 
 model Review {
-  reviewID            BigInt       @id @default(autoincrement())
+  reviewID            BigInt @id @default(autoincrement())
   rating              Int
   description         String
   reviewerId          BigInt
   revieweeId          BigInt
   linkedTransactionId BigInt
-  asClientReview      Transaction? @relation("ClientReview")
-  asDeveloperReview   Transaction? @relation("DeveloperReview")
+
+  asClientReview    Transaction? @relation("ClientReview")
+  asDeveloperReview Transaction? @relation("DeveloperReview")
 
   @@unique([reviewerId, linkedTransactionId])
   @@index([revieweeId])
@@ -94,4 +96,6 @@ model Application {
   apiKey    String   @unique
   createdAt DateTime @default(now())
   active    Boolean  @default(true)
+
+  @@map("Applications")
 }

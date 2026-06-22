@@ -3,6 +3,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import {
+  getCurrentUser,
   // editUser,
   getReviewsFromUserID,
   getTransactionsFromUserID,
@@ -95,6 +96,7 @@ app.get("/api/health", (_, res) => {
 
 // USER API
 // app.post("/api/users", newUser);
+app.get("/api/users/self", getCurrentUser)
 app.get("/api/users/:id", getUserFromID);
 app.get("/api/users/:id/transactions", getTransactionsFromUserID);
 app.get("/api/users/:id/reviews", getReviewsFromUserID);

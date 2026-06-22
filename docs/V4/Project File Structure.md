@@ -1,0 +1,72 @@
+### Web
+top-level-domain.com
+- /
+	- Landing page
+	- Signup/login
+	- Site description
+	- User count display
+	- Transaction count display
+- /users
+	- Redirects to “explore” page
+	- /{Roblox UserId}
+		- User profile
+		- /history
+			- User’s transaction history
+		- /reviews
+			- User’s ratings and reviews
+- /transactions
+	- Redirects to “explore” page
+	- /{Transaction UUID}
+		- Specified transaction information
+- /explore
+	- List of users (row for each user)
+		- (Each row has username, rating, # transactions, $ earned+spent)
+	- ?search={SEARCH ENTRY}
+		- username or UserId
+	- ?sort={SORT CRITERIA}
+		- username (A-Z)
+		- rating
+		-  transactions #
+		- $ earned+spent
+		- relevance (default)
+	- ?page={PAGE NUMBER}
+		- Self-explanatory
+- /api
+	- /users
+		- /{Roblox UserId}
+			- POST: make new user
+			- GET: send user data
+			- /transactions
+				- GET: send user transaction history
+				- ?cursor={}
+			- /reviews
+				- GET: send user review history
+				- ?cursor={}
+
+	- /transactions
+		- POST: new transaction
+		- ?target={TRANSACTION ID}
+			- Returns the data for specified transaction or not found
+			- Returns array of multiple if input is an array of multiple
+			- Returns not found if even one is missing
+		- /{Transaction ID}
+			- PATCH: Edits transaction fields (status excluded)
+			- /accept
+				- POST: Developer accepts (from Pending)
+			- /complete
+				- POST: Marks as complete (from Ongoing)
+			- /cancel
+				- POST: Cancels (from Pending or Ongoing)
+			- /report
+				- POST: Flags a dispute (from Pending, Ongoing, or Success)
+			- /reviews
+				- POST: Leaves a review for the other party (from Success)
+			- /media
+				- POST: Attaches media to the transaction
+				- /{Media ID}
+					- DELETE: Removes media from the transaction
+	- /reviews
+		- ?target={REVIEW ID}
+			- Returns the data for specified review or not found
+			- Returns array of multiple if input is an array of multiple
+			- Returns not found if even one is missing

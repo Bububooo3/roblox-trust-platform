@@ -85,7 +85,7 @@ export function getBigIntsFromTargetQueries(target: unknown): bigint[] | null {
 // ===========================================================================
 
 // Type mirror of the prisma datastructure
-type StatusMirror =
+export type StatusMirror =
   | "Success"
   | "Cancelled"
   | "Reported"

@@ -21,6 +21,27 @@ import {
 
 // ===========================================================================
 
+// GET .../api/users/self
+export const getCurrentUser = asyncHandler(async (req, res) => {
+  if (!req.session.userId) {
+    res.status(400).json({ message: `No userId specified` });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { rblxUserID: req.session.userId },
+  });
+
+  if (!user) {
+    res.status(404).json({ message: `User ${req.session.userId} not found` });
+    return;
+  }
+
+  res.json(serializeBigInts(user));
+});
+
+// ===========================================================================
+
 // GET .../api/users/:id
 export const getUserFromID = asyncHandler(async (req, res) => {
   const localID = req.params.id;
