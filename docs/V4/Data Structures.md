@@ -107,10 +107,10 @@
 | Type         | Description                   |
 | ------------ | ----------------------------- |
 | `Link`       | A link to an external webpage |
-| `Picture`    | A picture/image               |
-| `Experience` | A link to a Roblox experience |
-| `Group`      | A link to a Roblox group      |
-| `Asset`      | A link to a Roblox asset      |
+| `Picture`    | A roblox image                |
+| `Experience` | A roblox experience           |
+| `Group`      | A roblox group                |
+| `Asset`      | A roblox asset                |
 
 <hr>
 <br>
