@@ -22,7 +22,8 @@
 - If employee does not confirm, the transaction is left open until it is confirmed, cancelled, or reported
 
 <hr>
-### EMPLOYEE
+
+### DEVELOPER
 #### (Background Check)
 - Search client by username or account id
 - Navigate to their profile
