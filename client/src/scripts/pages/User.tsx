@@ -7,16 +7,16 @@ async function fetchUserData(id: number): Promise<userData | null> {
     const header = new Headers();
     header.append("x-api-key", apiKey);
 
-    const response = await fetch(`${backendDomain}/api/users/${id}`, {
+    const res = await fetch(`${backendDomain}/api/users/${id}`, {
       method: "GET",
       headers: header,
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
     }
 
-    const data: userData = (await response.json()) as userData;
+    const data: userData = (await res.json()) as userData;
     return data;
   } catch (error) {
     console.error("Failed to fetch user:", (error as Error).message || error);
@@ -57,10 +57,30 @@ function UserProfilePage() {
   }
 
   return (
-    <div>
-      <h2>Viewing User ID: {data.id}</h2>
-      {/* Render other user data fields here */}
-    </div>
+    <>
+      <h1>{data.robloxUsername}</h1>
+      <h3>
+        <i>Last login: {new Date(data.lastLogin).toUTCString()}</i>
+      </h3>
+      <hr></hr>
+      <div>
+        <h4>
+          Roblox Account Age:
+          {(Math.round(data.robloxAccountAge / 365) > 0 ? " ~" : " ") +
+            Math.round(data.robloxAccountAge / 365)}{" "}
+          {Math.round(data.robloxAccountAge / 365) === 1 ? " year" : " years"}{" "}
+          <i>({data.robloxAccountAge} days)</i>
+        </h4>
+        <h4>
+          Platform Account Age:
+          {(Math.round(data.productAccountAge / 365) > 0 ? " ~" : " ") +
+            Math.round(data.productAccountAge / 365)}{" "}
+          {Math.round(data.productAccountAge / 365) === 1 ? " year" : " years"}{" "}
+          <i>({data.productAccountAge} days)</i>
+        </h4>
+      </div>
+      <hr></hr>
+    </>
   );
 }
 
