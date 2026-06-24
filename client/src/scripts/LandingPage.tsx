@@ -2,7 +2,7 @@
 
 import LoginButton from "./components/login";
 
-function App() {
+function LandingPage() {
   return (
     <>
       <h1>Roblox Trust Platform</h1>
@@ -12,4 +12,4 @@ function App() {
   );
 }
 
-export default App;
+export default LandingPage;

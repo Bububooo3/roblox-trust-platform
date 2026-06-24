@@ -4,14 +4,14 @@ import "../styles/index.css";
 // import App from "./App.tsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import UserProfilePage from "./pages/User";
-import App from "./App";
+import LandingPage from "./LandingPage";
 
 createRoot(document.getElementById("root")!).render(
   <>
     <StrictMode>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<App />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/users/:robloxUserId" element={<UserProfilePage />} />
         </Routes>
       </BrowserRouter>
