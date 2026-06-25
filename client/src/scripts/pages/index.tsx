@@ -1,6 +1,6 @@
 // import "../styles/index.css";
 
-import LoginButton from "./components/login";
+import LoginButton from "../components/login";
 
 function LandingPage() {
   return (
