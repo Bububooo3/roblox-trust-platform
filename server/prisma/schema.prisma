@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id                BigInt   @id @default(autoincrement())
-  rblxUserID        BigInt   @unique
-  robloxUsername    String
-  productAccountAge Int
-  robloxAccountAge  Int
-  lastLogin         DateTime @default(now())
+  id                         BigInt   @id @default(autoincrement())
+  rblxUserID                 BigInt   @unique
+  robloxUsername             String
+  productAccountAge          Int
+  robloxAccountAge           Int
+  lastLogin                  DateTime @default(now())
+  productAccountCreationDate DateTime @default(now())
 
   @@map("Users")
 }
@@ -64,7 +65,7 @@ model Review {
 }
 
 model Media {
-  mediaId             BigInt      @id @default(autoincrement())
+  mediaId             BigInt    @id @default(autoincrement())
   type                MediaType
   linkedTransactionId BigInt
   contentID           BigInt?
