@@ -67,3 +67,16 @@ export type MediaTypeMirror =
   | "experience"
   | "group"
   | "asset";
+
+export type transactionDataCollection = {
+  data: transactionData[];
+};
+
+export type reviewDataCollection = {
+  data: reviewData[];
+};
+
+export type jointDataReturn = {
+  review: reviewData;
+  transaction: transactionData;
+};

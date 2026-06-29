@@ -1,66 +1,15 @@
 import { useParams } from "react-router-dom";
-import type { transactionData, userData } from "../../../util/types";
-import { apiKey, backendDomain } from "../../../util/constants";
+import type { transactionDataCollection, userData } from "../../../util/types";
 import { useState, useEffect } from "react";
 import { NotFoundPage } from "../404";
 import LoadingScreen from "../loading";
 import TransactionInfoFrame from "../../components/transactionInfoFrame";
+import {
+  getUser,
+  getUserTransactions
+} from "../../api/users";
 
 const currentTime = Date.now();
-
-type transactionDataCollection = {
-  data: transactionData[];
-};
-
-async function fetchUserData(id: number): Promise<userData | null> {
-  try {
-    const header = new Headers();
-    header.append("x-api-key", apiKey);
-
-    const res = await fetch(`${backendDomain}/api/users/${id}`, {
-      method: "GET",
-      headers: header,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: userData = (await res.json()) as userData;
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch user:", (error as Error).message || error);
-    return null;
-  }
-}
-
-async function getUserTransactions(
-  id: number,
-): Promise<transactionDataCollection | null> {
-  try {
-    const header = new Headers();
-    header.append("x-api-key", apiKey);
-
-    const res = await fetch(`${backendDomain}/api/users/${id}/transactions`, {
-      method: "GET",
-      headers: header,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: transactionDataCollection =
-      (await res.json()) as transactionDataCollection;
-    return data;
-  } catch (error) {
-    console.error(
-      "Failed to fetch user transaction data:",
-      (error as Error).message || error,
-    );
-    return null;
-  }
-}
 
 export function UserProfilePage() {
   const { robloxUserId } = useParams<{ robloxUserId: string }>();
@@ -75,7 +24,7 @@ export function UserProfilePage() {
 
       setIsLoading(true);
 
-      const userDataResult = await fetchUserData(Number(robloxUserId));
+      const userDataResult = await getUser(Number(robloxUserId));
       setMyUserData(userDataResult);
 
       const transactionDataResult = await getUserTransactions(
