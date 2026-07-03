@@ -1,6 +1,5 @@
 import { apiKey, backendDomain } from "../../util/constants";
 import type { mediaData, MediaTypeMirror } from "../../util/types";
-import notify from "../functionality/notifications";
 
 // VARIABLES
 const baseURL = `${backendDomain}/api/transactions`;
@@ -26,7 +25,7 @@ export async function createMedia(
     const data: mediaData = (await res.json()) as mediaData;
     return data;
   } catch (error) {
-    notify(`Failed to create media: ${(error as Error).message || error}`);
+    console.log(`Failed to create media: ${(error as Error).message || error}`);
     return null;
   }
 }
@@ -48,7 +47,7 @@ export async function getMediaFromTransaction(
     const data: mediaData = (await res.json()) as mediaData;
     return data;
   } catch (error) {
-    notify(`Failed to fetch media: ${(error as Error).message || error}`);
+    console.log(`Failed to fetch media: ${(error as Error).message || error}`);
     return null;
   }
 }
@@ -70,7 +69,7 @@ export async function deleteMediaFromTransaction(
     const data: mediaData = (await res.json()) as mediaData;
     return data;
   } catch (error) {
-    notify(`Failed to delete media: ${(error as Error).message || error}`);
+    console.log(`Failed to delete media: ${(error as Error).message || error}`);
     return null;
   }
 }

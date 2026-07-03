@@ -1,10 +1,13 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "../styles/index.css";
+import { createRoot } from "react-dom/client"
 // import App from "./App.tsx";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import UserProfilePage from "./pages/users/users";
 import LandingPage from "./pages";
+
+import '@coreui/coreui/dist/css/coreui.min.css'
+import "../styles/simple.css"
+import { NotFoundPage } from "./pages/404";
 
 createRoot(document.getElementById("root")!).render(
   <>
@@ -15,7 +18,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/" element={<LandingPage />} />
 
           {/* ../auth */}
-          <Route path="/auth/roblox/login" element="" />
+          <Route path="/login" element="" />
           <Route path="/auth/roblox/return" element="" />
 
           {/* ../users */}
@@ -30,6 +33,9 @@ createRoot(document.getElementById("root")!).render(
 
           {/* ../explore */}
           <Route path="/explore" element="" />
+
+          {/* NOT FOUND */}
+          <Route path="*" element={<NotFoundPage details="Web route does not exist!" />} />
           <Route />
         </Routes>
       </BrowserRouter>

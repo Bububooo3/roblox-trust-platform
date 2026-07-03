@@ -3,7 +3,6 @@ import type {
   transactionData,
   transactionDataCollection,
 } from "../../util/types";
-import notify from "../functionality/notifications";
 
 // VARIABLES
 const baseURL = `${backendDomain}/api/transactions`;
@@ -38,7 +37,7 @@ export async function getTransactions(
       (await res.json()) as transactionDataCollection;
     return data;
   } catch (error) {
-    notify(
+    console.log(
       `Failed to fetch transactions: ${(error as Error).message || error}`,
     );
     return null;
@@ -66,7 +65,7 @@ export async function createTransaction(initData: {
     const data: transactionData = (await res.json()) as transactionData;
     return data;
   } catch (error) {
-    notify(
+    console.log(
       `Failed to create transaction: ${(error as Error).message || error}`,
     );
     return null;
@@ -107,7 +106,9 @@ export async function editTransaction(
     const data: transactionData = (await res.json()) as transactionData;
     return data;
   } catch (error) {
-    notify(`Failed to edit transaction: ${(error as Error).message || error}`);
+    console.log(
+      `Failed to edit transaction: ${(error as Error).message || error}`,
+    );
     return null;
   }
 }
@@ -123,7 +124,7 @@ export async function setTransactionComplete(id: number) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
   } catch (error) {
-    notify(
+    console.log(
       `Failed to set transaction status to complete: ${(error as Error).message || error}`,
     );
     return null;
@@ -141,7 +142,7 @@ export async function setTransactionCancelled(id: number) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
   } catch (error) {
-    notify(
+    console.log(
       `Failed to set transaction status to complete: ${(error as Error).message || error}`,
     );
     return null;
@@ -159,7 +160,7 @@ export async function setTransactionAccepted(id: number) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
   } catch (error) {
-    notify(
+    console.log(
       `Failed to set transaction status to complete: ${(error as Error).message || error}`,
     );
     return null;
@@ -177,7 +178,7 @@ export async function setTransactionReported(id: number) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
   } catch (error) {
-    notify(
+    console.log(
       `Failed to set transaction status to complete: ${(error as Error).message || error}`,
     );
     return null;

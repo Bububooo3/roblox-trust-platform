@@ -1,5 +1,4 @@
 import { apiKey, backendDomain } from "../../util/constants";
-import notify from "../functionality/notifications";
 
 // VARIABLES
 const baseURL = `${backendDomain}/api-keys`;
@@ -26,7 +25,7 @@ export async function generateAPIKey(name: string): Promise<string | null> {
     const data: string = (await res.json()) as string;
     return data;
   } catch (error) {
-    notify(`Failed to generate API key: ${(error as Error).message || error}`);
+    console.log(`Failed to generate API key: ${(error as Error).message || (error as string)}`)
     return null;
   }
 }
@@ -46,7 +45,7 @@ export async function deleteAPIKey(key: string) {
     const data: string = (await res.json()) as string;
     return data;
   } catch (error) {
-    notify(`Failed to delete API key: ${(error as Error).message || error}`);
+    console.log(`Failed to delete API key: ${(error as Error).message || error}`);
     return null;
   }
 }

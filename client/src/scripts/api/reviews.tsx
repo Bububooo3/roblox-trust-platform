@@ -1,6 +1,5 @@
 import { apiKey, backendDomain } from "../../util/constants";
 import type { jointDataReturn, reviewDataCollection } from "../../util/types";
-import notify from "../functionality/notifications";
 
 // VARIABLES
 const baseURL = `${backendDomain}/api/reviews`;
@@ -30,7 +29,7 @@ export async function submitReview(
     const data: jointDataReturn = (await res.json()) as jointDataReturn;
     return data;
   } catch (error) {
-    notify(`Failed to submit reiew: ${(error as Error).message || error}`);
+    console.log(`Failed to submit reiew: ${(error as Error).message || error}`);
     return null;
   }
 }
@@ -62,7 +61,7 @@ export async function getReviews(
       (await res.json()) as reviewDataCollection;
     return data;
   } catch (error) {
-    notify(`Failed to fetch reviews: ${(error as Error).message || error}`);
+    console.log(`Failed to fetch reviews: ${(error as Error).message || error}`);
     return null;
   }
 }
@@ -90,7 +89,7 @@ export async function editReview(
       (await res.json()) as reviewDataCollection;
     return data;
   } catch (error) {
-    notify(`Failed to fetch reviews: ${(error as Error).message || error}`);
+    console.log(`Failed to fetch reviews: ${(error as Error).message || error}`);
     return null;
   }
 }

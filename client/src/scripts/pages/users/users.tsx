@@ -4,10 +4,8 @@ import { useState, useEffect } from "react";
 import { NotFoundPage } from "../404";
 import LoadingScreen from "../loading";
 import TransactionInfoFrame from "../../components/transactionInfoFrame";
-import {
-  getUser,
-  getUserTransactions
-} from "../../api/users";
+import { getUser, getUserTransactions } from "../../api/users";
+import Notify from "../../functionality/notifications";
 
 const currentTime = Date.now();
 
@@ -25,6 +23,7 @@ export function UserProfilePage() {
       setIsLoading(true);
 
       const userDataResult = await getUser(Number(robloxUserId));
+
       setMyUserData(userDataResult);
 
       const transactionDataResult = await getUserTransactions(
@@ -44,7 +43,10 @@ export function UserProfilePage() {
 
   if (myUserData === null) {
     return (
-      <NotFoundPage details={<>User Id is unregistered: {robloxUserId}</>} />
+      <>
+        <NotFoundPage details={<>User Id is unregistered: {robloxUserId}</>} />
+        <Notify msg={"22"} level={2} />
+      </>
     );
   }
 

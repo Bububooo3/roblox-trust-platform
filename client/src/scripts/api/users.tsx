@@ -4,7 +4,6 @@ import type {
   transactionDataCollection,
   userData,
 } from "../../util/types";
-import notify from "../functionality/notifications";
 
 // VARIABLES
 const baseURL = `${backendDomain}/api/users`;
@@ -26,8 +25,8 @@ export async function getUser(id: number): Promise<userData | null> {
     const data: userData = (await res.json()) as userData;
     return data;
   } catch (error) {
-    // console.error("Failed to fetch user:", (error as Error).message || error);
-    notify(`Failed to fetch user: ${(error as Error).message || error}`);
+    console.error("Failed to fetch user:", (error as Error).message || error);
+    // notify(`Failed to fetch user: ${(error as Error).message || error}`, 3);
     return null;
   }
 }
@@ -50,7 +49,7 @@ export async function getUserTransactions(
     return data;
   } catch (error) {
     // console.error("Failed to fetch user transaction data:", (error as Error).message || error);
-    notify(
+    console.log(
       `Failed to fetch user transactions: ${(error as Error).message || error}`,
     );
     return null;
@@ -71,12 +70,14 @@ export async function getSelf(): Promise<userData | null> {
     const data: userData = (await res.json()) as userData;
     return data;
   } catch (error) {
-    notify(`Failed to fetch user: ${(error as Error).message || error}`);
+    console.log(`Failed to fetch user: ${(error as Error).message || error}`);
     return null;
   }
 }
 
-export async function getUserReviews(id: number): Promise<reviewDataCollection | null> {
+export async function getUserReviews(
+  id: number,
+): Promise<reviewDataCollection | null> {
   try {
     const res = await fetch(`${baseURL}/${id}/reviews`, {
       method: "GET",
@@ -91,7 +92,7 @@ export async function getUserReviews(id: number): Promise<reviewDataCollection |
       (await res.json()) as reviewDataCollection;
     return data;
   } catch (error) {
-    notify(
+    console.log(
       `Failed to fetch user reviews: ${(error as Error).message || error}`,
     );
     return null;
