@@ -6,6 +6,7 @@ import LoadingScreen from "../loading";
 import TransactionInfoFrame from "../../components/transactionInfoFrame";
 import { getUser, getUserTransactions } from "../../api/users";
 import Notify from "../../functionality/notifications";
+import { CToaster } from "@coreui/react";
 
 const currentTime = Date.now();
 
@@ -45,7 +46,11 @@ export function UserProfilePage() {
     return (
       <>
         <NotFoundPage details={<>User Id is unregistered: {robloxUserId}</>} />
-        <Notify msg={"22"} level={2} />
+        {/* <div style={{margin: "2vw 10vh"}}> */}
+          <CToaster placement="bottom-end">
+            <Notify msg={`Failed to fetch user: ${robloxUserId}`} level={3} />
+          </CToaster>
+        {/* </div> */}
       </>
     );
   }
