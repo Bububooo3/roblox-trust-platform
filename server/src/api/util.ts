@@ -135,9 +135,14 @@ export async function setTransactionStatus(
     return;
   }
 
+  if (!req.session.userId) {
+    res.status(400).json({ message: `No userId specified` });
+    return;
+  }
+
   if (
-    transaction.clientId !== req.session.userId &&
-    transaction.developerId !== req.session.userId
+    transaction.clientId !== BigInt(req.session.userId!) &&
+    transaction.developerId !== BigInt(req.session.userId!)
   ) {
     res.status(403).json({
       message: "Forbidden",

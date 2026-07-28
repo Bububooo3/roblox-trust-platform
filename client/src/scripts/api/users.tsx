@@ -1,54 +1,31 @@
-import { apiKey, backendDomain } from "../../util/constants";
+import { apiFetch } from "./apiClient";
 import type {
+  exploreResponse,
+  platformStats,
   reviewDataCollection,
+  transactionData,
   transactionDataCollection,
   userData,
 } from "../../util/types";
 
-// VARIABLES
-const baseURL = `${backendDomain}/api/users`;
-const headers = new Headers();
-headers.append("x-api-key", apiKey);
-
-// FUNCTIONS
 export async function getUser(id: number): Promise<userData | null> {
   try {
-    const res = await fetch(`${baseURL}/${id}`, {
-      method: "GET",
-      headers,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: userData = (await res.json()) as userData;
-    return data;
+    return await apiFetch<userData>(`/api/users/${id}`);
   } catch (error) {
     console.error("Failed to fetch user:", (error as Error).message || error);
-    // notify(`Failed to fetch user: ${(error as Error).message || error}`, 3);
     return null;
   }
 }
 
 export async function getUserTransactions(
   id: number,
+  cursor = 0,
 ): Promise<transactionDataCollection | null> {
   try {
-    const res = await fetch(`${baseURL}/${id}/transactions`, {
-      method: "GET",
-      headers,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: transactionDataCollection =
-      (await res.json()) as transactionDataCollection;
-    return data;
+    return await apiFetch<transactionDataCollection>(
+      `/api/users/${id}/transactions?cursor=${cursor}`,
+    );
   } catch (error) {
-    // console.error("Failed to fetch user transaction data:", (error as Error).message || error);
     console.log(
       `Failed to fetch user transactions: ${(error as Error).message || error}`,
     );
@@ -58,42 +35,81 @@ export async function getUserTransactions(
 
 export async function getSelf(): Promise<userData | null> {
   try {
-    const res = await fetch(`${baseURL}/self`, {
-      method: "GET",
-      headers,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: userData = (await res.json()) as userData;
-    return data;
-  } catch (error) {
-    console.log(`Failed to fetch user: ${(error as Error).message || error}`);
+    return await apiFetch<userData>("/api/users/self");
+  } catch {
     return null;
   }
 }
 
 export async function getUserReviews(
   id: number,
+  cursor = 0,
 ): Promise<reviewDataCollection | null> {
   try {
-    const res = await fetch(`${baseURL}/${id}/reviews`, {
-      method: "GET",
-      headers,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: reviewDataCollection =
-      (await res.json()) as reviewDataCollection;
-    return data;
+    return await apiFetch<reviewDataCollection>(
+      `/api/users/${id}/reviews?cursor=${cursor}`,
+    );
   } catch (error) {
     console.log(
       `Failed to fetch user reviews: ${(error as Error).message || error}`,
+    );
+    return null;
+  }
+}
+
+export async function getExploreUsers(params: {
+  search?: string;
+  sort?: string;
+  page?: number;
+}): Promise<exploreResponse | null> {
+  try {
+    const query = new URLSearchParams();
+    if (params.search) query.set("search", params.search);
+    if (params.sort) query.set("sort", params.sort);
+    if (params.page) query.set("page", String(params.page));
+
+    const suffix = query.toString() ? `?${query.toString()}` : "";
+    return await apiFetch<exploreResponse>(`/api/explore${suffix}`);
+  } catch (error) {
+    console.log(`Failed to fetch explore data: ${(error as Error).message}`);
+    return null;
+  }
+}
+
+export async function getPlatformStats(): Promise<platformStats | null> {
+  try {
+    return await apiFetch<platformStats>("/api/explore/stats");
+  } catch {
+    return null;
+  }
+}
+
+export async function getTransaction(id: number): Promise<transactionData | null> {
+  try {
+    return await apiFetch<transactionData>(`/api/transactions?target=${id}`);
+  } catch (error) {
+    console.log(
+      `Failed to fetch transaction: ${(error as Error).message || error}`,
+    );
+    return null;
+  }
+}
+
+export async function getTransactions(
+  ids: number[],
+): Promise<transactionData[] | null> {
+  if (ids.length === 0) return [];
+
+  const query = ids.map((id) => `target=${id}`).join("&");
+
+  try {
+    const data = await apiFetch<transactionData | transactionData[]>(
+      `/api/transactions?${query}`,
+    );
+    return Array.isArray(data) ? data : [data];
+  } catch (error) {
+    console.log(
+      `Failed to fetch transactions: ${(error as Error).message || error}`,
     );
     return null;
   }

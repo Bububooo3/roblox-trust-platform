@@ -2,13 +2,13 @@ import { CToast, CToastBody, CToastHeader } from "@coreui/react";
 
 const colors = Array.of("#007aff", "#ffd900", "#ff1e00");
 
-const Notify = ({ msg, level }: { msg: string; level: number }) => {
+const Notify = ({ msg, level, onClose }: { msg: string; level: number; onClose: () => void }) => {
 //   alert(msg);
 
 const mycolor: string = colors[level - 1] || colors[0]
 
   return (
-    <CToast autohide={false} visible={true}>
+    <CToast autohide={false} visible={true} onClose={onClose} index={level}>
       <CToastHeader closeButton>
         <svg
           className="rounded me-2"

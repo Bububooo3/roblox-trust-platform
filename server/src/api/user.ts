@@ -29,7 +29,7 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
   }
 
   const user = await prisma.user.findUnique({
-    where: { rblxUserID: req.session.userId },
+    where: { rblxUserID: BigInt(req.session.userId!) },
   });
 
   if (!user) {

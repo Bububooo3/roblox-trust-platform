@@ -53,9 +53,14 @@ export const newReview = // client/dev on a completed transaction reviews other 
     let revieweeId: bigint;
     let slot: "clientReviewId" | "developerReviewId";
 
+  if (!req.session.userId) {
+    res.status(400).json({ message: `No userId specified` });
+    return;
+  }
+
     if (
-      transaction.clientId !== req.session.userId &&
-      transaction.developerId !== req.session.userId
+      transaction.clientId !== BigInt(req.session.userId!) &&
+      transaction.developerId !== BigInt(req.session.userId!)
     ) {
       res.status(403).json({
         message: `${parsedReviewerId} is not a party to this transaction`,
@@ -172,8 +177,8 @@ export const editReview = asyncHandler(async (req, res) => {
   }
 
   if (
-    targetReview.revieweeId !== req.session.userId &&
-    targetReview.reviewerId !== req.session.userId
+    targetReview.revieweeId !== BigInt(req.session.userId!) &&
+    targetReview.reviewerId !== BigInt(req.session.userId!)
   ) {
     res.status(403).json({
       message: `${req.session.userId} is not a party to this transaction`,

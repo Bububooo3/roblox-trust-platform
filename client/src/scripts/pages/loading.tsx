@@ -5,10 +5,10 @@ function LoadingScreen({ details }: { details: React.ReactNode }) {
     <>
       <div  className="d-flex justify-content-center m-5">
         <CSpinner />
+      </div>
         <br />
         <br />
         <div>{details}</div>
-      </div>
     </>
   );
 }

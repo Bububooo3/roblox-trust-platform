@@ -59,9 +59,14 @@ export const newTransaction = asyncHandler(async (req, res) => {
     return;
   }
 
+  if (!req.session.userId) {
+    res.status(400).json({ message: `No userId specified` });
+    return;
+  }
+
   if (
-    parsedClientId !== req.session.userId &&
-    parsedDeveloperId !== req.session.userId
+    parsedClientId !== BigInt(req.session.userId!) &&
+    parsedDeveloperId !== BigInt(req.session.userId!)
   ) {
     res.status(403).json({
       message: "Forbidden",
@@ -141,8 +146,8 @@ export const editTransaction = asyncHandler(async (req, res) => {
   }
 
   if (
-    targetTransaction.clientId !== req.session.userId &&
-    targetTransaction.developerId !== req.session.userId
+    targetTransaction.clientId !== BigInt(req.session.userId!) &&
+    targetTransaction.developerId !== BigInt(req.session.userId!)
   ) {
     res.status(403).json({
       message: "Forbidden",

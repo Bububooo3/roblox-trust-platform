@@ -1,0 +1,251 @@
+@import "tailwindcss";
+
+:root {
+  --rtp-primary: #0066ff;
+  --rtp-primary-dark: #0052cc;
+  --rtp-accent: #00b06f;
+  --rtp-surface: #f4f7fb;
+  --rtp-card: #ffffff;
+  --rtp-border: #dde4ee;
+  --rtp-text: #1a2332;
+  --rtp-muted: #5c6b7f;
+  --rtp-danger: #dc3545;
+  --rtp-warning: #ffc107;
+  --rtp-success: #198754;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background: var(--rtp-surface);
+  color: var(--rtp-text);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--rtp-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.rtp-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.rtp-card {
+  background: var(--rtp-card);
+  border: 1px solid var(--rtp-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgb(26 35 50 / 6%);
+}
+
+.rtp-card + .rtp-card {
+  margin-top: 1rem;
+}
+
+.rtp-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.rtp-stat {
+  text-align: center;
+  padding: 1rem;
+}
+
+.rtp-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--rtp-primary);
+}
+
+.rtp-stat-label {
+  font-size: 0.875rem;
+  color: var(--rtp-muted);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.status-success {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-ongoing {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #664d03;
+}
+
+.status-cancelled {
+  background: #e2e3e5;
+  color: #41464b;
+}
+
+.status-reported {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.hero {
+  background: linear-gradient(135deg, #0066ff 0%, #0044aa 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.hero h1 {
+  margin: 0 0 0.75rem;
+  font-size: 2.25rem;
+}
+
+.hero p {
+  margin: 0 0 1.5rem;
+  opacity: 0.92;
+  max-width: 560px;
+}
+
+.explore-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  align-items: center;
+}
+
+.explore-toolbar input,
+.explore-toolbar select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--rtp-border);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+}
+
+.explore-toolbar input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.user-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--rtp-border);
+}
+
+.user-row:last-child {
+  border-bottom: none;
+}
+
+.user-row-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--rtp-muted);
+  letter-spacing: 0.04em;
+}
+
+.profile-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--rtp-primary), #0044aa);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--rtp-border);
+  margin-bottom: 1.25rem;
+}
+
+.tab-nav a {
+  padding: 0.625rem 1rem;
+  color: var(--rtp-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-weight: 500;
+}
+
+.tab-nav a.active,
+.tab-nav a:hover {
+  color: var(--rtp-primary);
+  text-decoration: none;
+}
+
+.tab-nav a.active {
+  border-bottom-color: var(--rtp-primary);
+}
+
+.star-rating {
+  color: #ffc107;
+  letter-spacing: 0.05em;
+}
+
+.action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .user-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+    padding: 1rem 0;
+  }
+
+  .user-row-header {
+    display: none;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+}

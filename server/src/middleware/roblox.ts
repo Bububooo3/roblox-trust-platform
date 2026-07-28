@@ -32,6 +32,7 @@ export const robloxLoginReturn = async (req: any, res: any) => {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "RobloxOAuth/2.0"
     },
     body: new URLSearchParams({
       grant_type: "authorization_code",
@@ -43,6 +44,14 @@ export const robloxLoginReturn = async (req: any, res: any) => {
   });
 
   const tokens = await tokenResponse.json();
+
+  if (!tokenResponse.ok) {
+    const errorText = await tokenResponse.text();
+    console.error("Roblox Token Error:", errorText);
+    return res
+      .status(tokenResponse.status)
+      .send(`Roblox Auth Failed: ${errorText}`);
+  }
 
   // Get User Info
   const profileResponse = await fetch(
@@ -65,18 +74,23 @@ export const robloxLoginReturn = async (req: any, res: any) => {
     update: {
       robloxUsername: userInfo.preferred_username,
       lastLogin: new Date(),
+      robloxAccountAge: Math.abs(
+        Math.floor(Date.now() / 1000) - userInfo.created_at,
+      )/86400,
     },
 
     create: {
       rblxUserID,
       robloxUsername: userInfo.preferred_username,
       productAccountAge: 0,
-      robloxAccountAge: Math.abs(Math.floor(Date.now()/1000) - userInfo.created_at),
+      robloxAccountAge: Math.abs(
+        Math.floor(Date.now() / 1000) - userInfo.created_at,
+      )/86400,
     },
   });
 
   // Save user ID in session
-  req.session.userId = user.rblxUserID;
+  req.session.userId = Number(user.rblxUserID);
 
   res.redirect(process.env.FRONTEND_URL!);
 };

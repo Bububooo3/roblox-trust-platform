@@ -1,44 +1,56 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client"
-// import App from "./App.tsx";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import UserProfilePage from "./pages/users/users";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import AppLayout from "./components/layout/AppLayout";
+import { AuthProvider } from "./context/AuthContext";
 import LandingPage from "./pages";
-
-import '@coreui/coreui/dist/css/coreui.min.css'
-import "../styles/simple.css"
+import ExplorePage from "./pages/explore";
+import UserOverviewPage from "./pages/users/users";
+import UserHistoryPage from "./pages/users/history";
+import UserReviewsPage from "./pages/users/reviews";
+import TransactionPage from "./pages/transactions/transaction";
+import AuthSendoffPage from "./pages/auth/sendoff";
+import { UserProfileLayout } from "./components/UserProfileLayout";
 import { NotFoundPage } from "./pages/404";
 
+import "@coreui/coreui/dist/css/coreui.min.css";
+import "../styles/app.css";
+
 createRoot(document.getElementById("root")!).render(
-  <>
-    <StrictMode>
+  <StrictMode>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* ../ */}
-          <Route path="/" element={<LandingPage />} />
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/explore" element={<ExplorePage />} />
 
-          {/* ../auth */}
-          <Route path="/login" element="" />
-          <Route path="/auth/roblox/return" element="" />
+            <Route path="/users" element={<Navigate to="/explore" replace />} />
+            <Route path="/users/:robloxUserId" element={<UserProfileLayout />}>
+              <Route index element={<UserOverviewPage />} />
+              <Route path="history" element={<UserHistoryPage />} />
+              <Route path="reviews" element={<UserReviewsPage />} />
+            </Route>
 
-          {/* ../users */}
-          <Route path="/users" element="" />
-          <Route path="/users/:robloxUserId" element={<UserProfilePage />} />
-          <Route path="/users/:robloxUserId/history" element="" />
-          <Route path="/users/:robloxUserId/reviews" element="" />
+            <Route
+              path="/transactions"
+              element={<Navigate to="/explore" replace />}
+            />
+            <Route
+              path="/transactions/:transactionId"
+              element={<TransactionPage />}
+            />
 
-          {/* ../transactions */}
-          <Route path="/transactions" element="" />
-          <Route path="/transactions/:transactionId" element="" />
+            <Route path="/auth/roblox/login" element={<AuthSendoffPage />} />
+            <Route path="/login" element={<Navigate to="/auth/roblox/login" replace />} />
 
-          {/* ../explore */}
-          <Route path="/explore" element="" />
-
-          {/* NOT FOUND */}
-          <Route path="*" element={<NotFoundPage details="Web route does not exist!" />} />
-          <Route />
+            <Route
+              path="*"
+              element={<NotFoundPage details="This page does not exist." />}
+            />
+          </Route>
         </Routes>
       </BrowserRouter>
-    </StrictMode>
-  </>,
+    </AuthProvider>
+  </StrictMode>,
 );

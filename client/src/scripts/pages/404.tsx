@@ -1,5 +1,5 @@
 import { CAlert, CAlertHeading, CButton } from "@coreui/react";
-import { frontendDomain } from "../../util/constants";
+import { Link } from "react-router-dom";
 
 export function NotFoundPage({ details }: { details: React.ReactNode }) {
   return (
@@ -14,7 +14,9 @@ export function NotFoundPage({ details }: { details: React.ReactNode }) {
         <p>{details}</p>
       </CAlert>
       <br />
-      <CButton color="primary" href={frontendDomain}>Go Home</CButton>
+      <CButton color="primary" as={Link} to="/">
+        Go Home
+      </CButton>
     </>
   );
 }

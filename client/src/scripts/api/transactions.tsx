@@ -1,48 +1,5 @@
-import { apiKey, backendDomain } from "../../util/constants";
-import type {
-  transactionData,
-  transactionDataCollection,
-} from "../../util/types";
-
-// VARIABLES
-const baseURL = `${backendDomain}/api/transactions`;
-const headers = new Headers();
-headers.append("x-api-key", apiKey);
-
-// FUNCTIONS
-export async function getTransactions(
-  ids: number[],
-): Promise<transactionDataCollection | null> {
-  const targetProxy = ids.map((v, i) => {
-    if (i === 0) {
-      return `?target=${v}`;
-    } else {
-      return `&target=${v}`;
-    }
-  });
-
-  const target = targetProxy.join();
-
-  try {
-    const res = await fetch(`${baseURL}${target}`, {
-      method: "GET",
-      headers,
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: transactionDataCollection =
-      (await res.json()) as transactionDataCollection;
-    return data;
-  } catch (error) {
-    console.log(
-      `Failed to fetch transactions: ${(error as Error).message || error}`,
-    );
-    return null;
-  }
-}
+import { apiFetch } from "./apiClient";
+import type { transactionData } from "../../util/types";
 
 export async function createTransaction(initData: {
   projectName: string;
@@ -52,18 +9,10 @@ export async function createTransaction(initData: {
   description: string;
 }): Promise<transactionData | null> {
   try {
-    const res = await fetch(`${baseURL}`, {
+    return await apiFetch<transactionData>("/api/transactions", {
       method: "POST",
-      headers,
       body: JSON.stringify(initData),
     });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: transactionData = (await res.json()) as transactionData;
-    return data;
   } catch (error) {
     console.log(
       `Failed to create transaction: ${(error as Error).message || error}`,
@@ -75,36 +24,18 @@ export async function createTransaction(initData: {
 export async function editTransaction(
   id: number,
   editData: {
-    projectName: string | null;
-    amountInCents: number | null;
-    description: string | null;
-    visible: boolean | null;
+    projectName?: string;
+    amountInCents?: number;
+    description?: string;
+    visible?: boolean;
+    currency?: string;
   },
 ): Promise<transactionData | null> {
   try {
-    if (
-      !(
-        editData.projectName ||
-        editData.amountInCents ||
-        editData.description ||
-        editData.visible
-      )
-    ) {
-      throw new Error(`Processing error! No params included!`);
-    }
-
-    const res = await fetch(`${baseURL}/${id}`, {
+    return await apiFetch<transactionData>(`/api/transactions/${id}`, {
       method: "PATCH",
-      headers,
       body: JSON.stringify(editData),
     });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-
-    const data: transactionData = (await res.json()) as transactionData;
-    return data;
   } catch (error) {
     console.log(
       `Failed to edit transaction: ${(error as Error).message || error}`,
@@ -113,73 +44,61 @@ export async function editTransaction(
   }
 }
 
-export async function setTransactionComplete(id: number) {
+export async function setTransactionComplete(
+  id: number,
+): Promise<transactionData | null> {
   try {
-    const res = await fetch(`${baseURL}/${id}/complete`, {
+    return await apiFetch<transactionData>(`/api/transactions/${id}/complete`, {
       method: "POST",
-      headers,
     });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
   } catch (error) {
     console.log(
-      `Failed to set transaction status to complete: ${(error as Error).message || error}`,
+      `Failed to complete transaction: ${(error as Error).message || error}`,
     );
     return null;
   }
 }
 
-export async function setTransactionCancelled(id: number) {
+export async function setTransactionCancelled(
+  id: number,
+): Promise<transactionData | null> {
   try {
-    const res = await fetch(`${baseURL}/${id}/cancel`, {
+    return await apiFetch<transactionData>(`/api/transactions/${id}/cancel`, {
       method: "POST",
-      headers,
     });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
   } catch (error) {
     console.log(
-      `Failed to set transaction status to complete: ${(error as Error).message || error}`,
+      `Failed to cancel transaction: ${(error as Error).message || error}`,
     );
     return null;
   }
 }
 
-export async function setTransactionAccepted(id: number) {
+export async function setTransactionAccepted(
+  id: number,
+): Promise<transactionData | null> {
   try {
-    const res = await fetch(`${baseURL}/${id}/accept`, {
+    return await apiFetch<transactionData>(`/api/transactions/${id}/accept`, {
       method: "POST",
-      headers,
     });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
   } catch (error) {
     console.log(
-      `Failed to set transaction status to complete: ${(error as Error).message || error}`,
+      `Failed to accept transaction: ${(error as Error).message || error}`,
     );
     return null;
   }
 }
 
-export async function setTransactionReported(id: number) {
+export async function setTransactionReported(
+  id: number,
+): Promise<transactionData | null> {
   try {
-    const res = await fetch(`${baseURL}/${id}/report`, {
+    return await apiFetch<transactionData>(`/api/transactions/${id}/report`, {
       method: "POST",
-      headers,
     });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
   } catch (error) {
     console.log(
-      `Failed to set transaction status to complete: ${(error as Error).message || error}`,
+      `Failed to report transaction: ${(error as Error).message || error}`,
     );
     return null;
   }

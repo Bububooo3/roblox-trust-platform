@@ -68,15 +68,34 @@ export type MediaTypeMirror =
   | "group"
   | "asset";
 
-export type transactionDataCollection = {
-  data: transactionData[];
+export type paginatedResponse<T> = {
+  data: T[];
+  nextCursor: number | null;
 };
 
-export type reviewDataCollection = {
-  data: reviewData[];
-};
+export type transactionDataCollection = paginatedResponse<transactionData>;
+
+export type reviewDataCollection = paginatedResponse<reviewData>;
 
 export type jointDataReturn = {
   review: reviewData;
   transaction: transactionData;
+};
+
+export type exploreUserEntry = userData & {
+  averageRating: number | null;
+  transactionCount: number;
+  volume: number;
+};
+
+export type exploreResponse = {
+  data: exploreUserEntry[];
+  page: number;
+  totalPages: number;
+  total: number;
+};
+
+export type platformStats = {
+  userCount: number;
+  transactionCount: number;
 };

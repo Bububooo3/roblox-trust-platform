@@ -30,6 +30,7 @@ import {
   newMediaFromTransactionID,
 } from "./api/media.js";
 import { destroyAPIkey, generateAPIkey } from "./api/key.js";
+import { exploreStats, exploreUsers } from "./api/explore.js";
 import { authAPIkey, authUser } from "./middleware/auth.js";
 import { robloxLoginEnter, robloxLoginReturn } from "./middleware/roblox.js";
 
@@ -38,7 +39,12 @@ import { robloxLoginEnter, robloxLoginReturn } from "./middleware/roblox.js";
 // SETUP
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL ?? "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use("/api", authAPIkey);
 
@@ -91,6 +97,10 @@ app.get("/auth/roblox/return", robloxLoginReturn);
 app.get("/api/health", (_, res) => {
   res.json({ status: "ok" });
 });
+
+// EXPLORE API
+app.get("/api/explore/stats", exploreStats);
+app.get("/api/explore", exploreUsers);
 
 // ===========================================================================
 
