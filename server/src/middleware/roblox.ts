@@ -14,6 +14,9 @@ export const robloxLoginEnter = (req: any, res: any) => {
     state,
   });
 
+  console.log("SESSION:", req.session);
+  console.log("USER ID:", req.session.userId);
+
   res.redirect(`https://apis.roblox.com/oauth/v1/authorize?${params}`);
 };
 
@@ -76,7 +79,7 @@ export const robloxLoginReturn = async (req: any, res: any) => {
       lastLogin: new Date(),
       robloxAccountAge: Math.abs(
         Math.floor(Date.now() / 1000) - userInfo.created_at,
-      )/86400,
+      ) / 86400,
     },
 
     create: {
@@ -85,12 +88,23 @@ export const robloxLoginReturn = async (req: any, res: any) => {
       productAccountAge: 0,
       robloxAccountAge: Math.abs(
         Math.floor(Date.now() / 1000) - userInfo.created_at,
-      )/86400,
+      ) / 86400,
     },
   });
 
   // Save user ID in session
   req.session.userId = Number(user.rblxUserID);
 
-  res.redirect(process.env.FRONTEND_URL!);
+  console.log("AUTH SESSION:", req.session);
+  console.log("AUTH USER ID:", req.session.userId);
+
+  req.session.save((err: any) => {
+    if (err) {
+      console.error("Failed to save session:", err);
+      return res.status(500).send("Failed to save session");
+    }
+
+    console.log("SESSION SAVED");
+    res.redirect(process.env.FRONTEND_URL!);
+  });
 };
