@@ -1,0 +1,69 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:18
+    container_name: roblox-trust-platform-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: IHateKittens2000
+      POSTGRES_DB: roblox_trust_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: roblox-trust-platform-server
+    environment:
+      DATABASE_URL: postgresql://postgres:IHateKittens2000@db:5432/roblox_trust_platform
+      NODE_ENV: development
+      BACKEND_PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./server/src:/app/src
+    develop:
+      watch:
+        - path: ./server/src
+          action: rebuild
+    networks:
+      - app-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: roblox-trust-platform-client
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client/src:/app/src
+    develop:
+      watch:
+        - path: ./client/src
+          action: rebuild
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
